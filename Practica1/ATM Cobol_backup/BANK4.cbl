@@ -311,7 +311,7 @@
 
        EXIT-ENTER.
        *> ESTABA EN 24 80
-           ACCEPT PRESSED-KEY
+           ACCEPT PRESSED-KEY AT 2480
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE

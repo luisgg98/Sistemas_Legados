@@ -182,7 +182,7 @@
            DISPLAY "ESC - Salir" AT LINE 24 COL 34.
 
        PMENUA1. *> Estaba en 24 80) (
-           ACCEPT CHOICE ON EXCEPTION
+           ACCEPT CHOICE AT 2480 ON EXCEPTION
                IF ESC-PRESSED
                    GO TO IMPRIMIR-CABECERA
                ELSE
@@ -263,7 +263,7 @@
 
        PINT-ERR-ENTER.
        *>AT LINE 24 COL 80
-           ACCEPT  CHOICE ON EXCEPTION 
+           ACCEPT  CHOICE AT 2480 ON EXCEPTION 
            IF ENTER-PRESSED
                GO TO IMPRIMIR-CABECERA
            ELSE
@@ -301,7 +301,7 @@
 
        PPIN-ERR-ENTER.
        *> Estaba en 24 80
-           ACCEPT CHOICE ON EXCEPTION
+           ACCEPT CHOICE AT 2480 ON EXCEPTION
            IF ENTER-PRESSED
                GO TO P2
            ELSE

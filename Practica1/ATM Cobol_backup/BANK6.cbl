@@ -266,7 +266,7 @@
 
        ENTER-VERIFICACION.
        *> 24 80
-           ACCEPT PRESSED-KEY ON EXCEPTION
+           ACCEPT PRESSED-KEY AT 2480 ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
@@ -385,7 +385,7 @@
 
        EXIT-ENTER.
        *> 24 80
-           ACCEPT PRESSED-KEY
+           ACCEPT PRESSED-KEY AT 2480
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
