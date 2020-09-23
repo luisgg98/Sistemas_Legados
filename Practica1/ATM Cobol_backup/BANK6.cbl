@@ -111,6 +111,9 @@
                LINE 12 COL 54 PIC 9(16) USING CUENTA-DESTINO.
            05 FILLER AUTO UNDERLINE
                LINE 14 COL 54 PIC X(15) USING NOMBRE-DESTINO.
+
+           *> Se ha cambiado
+           *> eliminando BLANK ZERO Y UNA S AL TIPO DE DATO
            05 FILLER AUTO UNDERLINE
                SIGN IS LEADING SEPARATE
                LINE 16 COL 54 PIC S9(7) USING EURENT-USUARIO.

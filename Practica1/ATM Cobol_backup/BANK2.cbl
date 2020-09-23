@@ -159,7 +159,7 @@
 
        PSYS-ERR.
 
-           *>CLOSE F-MOVIMIENTOS.
+           CLOSE F-MOVIMIENTOS.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ha ocurrido un error interno"
