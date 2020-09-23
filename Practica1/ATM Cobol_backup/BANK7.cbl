@@ -236,6 +236,9 @@
        PROCEDURE DIVISION USING TNUM.
        IMPRIMIR-CABECERA.
 
+           *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
+           OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
+
            SET ENVIRONMENT 'COB_SCREEN_EXCEPTIONS' TO 'Y'
            SET ENVIRONMENT 'COB_SCREEN_ESC'        TO 'Y'
 
@@ -264,7 +267,7 @@
 
        CONSULTA-SALDO.
            OPEN I-O F-MOVIMIENTOS.
-           IF FSM <> 30
+           IF FSM <> 00
                GO TO PSYS-ERR.
 
            MOVE 0 TO LAST-USER-MOV-NUM.
@@ -313,7 +316,7 @@
            MOVE 9 TO LINEA-ESP-ACTUAL.
 
            OPEN I-O F-ESPECTACULOS.
-           IF FSE <> 30
+           IF FSE <> 00
                GO TO PSYS-ERR.
 
 

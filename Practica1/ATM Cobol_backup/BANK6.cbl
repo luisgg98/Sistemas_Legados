@@ -158,8 +158,13 @@
 
 
        MOVIMIENTOS-OPEN.
+
+
+           *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
+           OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
+
            OPEN I-O F-MOVIMIENTOS.
-           IF FSM <> 30 THEN
+           IF FSM <> 00 THEN
                GO TO PSYS-ERR
            END-IF.
 
