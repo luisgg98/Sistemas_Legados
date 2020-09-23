@@ -8,7 +8,7 @@
 
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT F-MOVIMIENTOS ASSIGN TO DISK
+           SELECT OPTIONAL F-MOVIMIENTOS ASSIGN TO DISK
            ORGANIZATION IS INDEXED
            ACCESS MODE IS DYNAMIC
            RECORD KEY IS MOV-NUM
@@ -88,6 +88,9 @@
 
        PROCEDURE DIVISION USING TNUM.
        IMPRIMIR-CABECERA.
+           
+           *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
+           OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
 
            SET ENVIRONMENT 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
 
@@ -109,7 +112,7 @@
 
        PCONSULTA-SALDO.
            OPEN INPUT F-MOVIMIENTOS.
-           IF FSM <> 30
+           IF FSM <> 00
                GO TO PSYS-ERR.
 
            MOVE 0 TO LAST-MOV-NUM.
@@ -156,7 +159,7 @@
 
        PSYS-ERR.
 
-           CLOSE F-MOVIMIENTOS.
+           *>CLOSE F-MOVIMIENTOS.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ha ocurrido un error interno"
@@ -168,6 +171,11 @@
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
            DISPLAY"Enter - Aceptar" AT LINE 24 COL 33.
+           
+           DISPLAY "FM" AT LINE 14 COL 15.
+           DISPLAY FSM AT LINE 15 COL 15.
+
+        
 
        EXIT-ENTER.
        *> Estaba en 24 80
