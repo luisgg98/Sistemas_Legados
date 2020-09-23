@@ -115,7 +115,7 @@
        P1.
            DISPLAY "Bienvenido a UnizarBank" AT LINE 8 COL 28.
            DISPLAY "Por favor, introduzca la tarjeta para operar"
-               AT LINE 10 COL 47.
+               AT LINE 10 COL 22.
 
            DISPLAY "Enter - Aceptar"
                 AT LINE 24 COL 33.
@@ -144,22 +144,24 @@
                    GO TO P2.
 
            OPEN I-O TARJETAS.
-           IF FST NOT = 00
+           IF FST NOT = 00 THEN
                GO TO PSYS-ERR.
            READ TARJETAS INVALID KEY GO TO PSYS-ERR.
 
            OPEN I-O INTENTOS.
-           IF FSI NOT = 00
+           IF FSI NOT = 00 THEN
                GO TO PSYS-ERR.
            MOVE TNUM TO INUM.
 
            READ INTENTOS INVALID KEY GO TO PSYS-ERR.
 
-           IF IINTENTOS = 0
+           IF IINTENTOS = 0 THEN
                GO TO PINT-ERR.
+         
 
-           IF PIN-INTRODUCIDO NOT = TPIN
+           IF PIN-INTRODUCIDO NOT = TPIN THEN
                GO TO PPIN-ERR.
+ 
 
            PERFORM REINICIAR-INTENTOS THRU REINICIAR-INTENTOS.
 
@@ -233,6 +235,7 @@
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
+
            GO TO PINT-ERR-ENTER.
 
 
@@ -283,7 +286,6 @@
                AT LINE 11 COL 30
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
-                    .
            DISPLAY IINTENTOS
                AT LINE 11 COL 40
                WITH FOREGROUND-COLOR IS BLACK
