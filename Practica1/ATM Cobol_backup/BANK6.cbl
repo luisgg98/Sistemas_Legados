@@ -199,7 +199,7 @@
            END-IF.
 
            MOVE LAST-USER-ORD-MOV-NUM TO MOV-NUM.
-
+           *> DE AQUI ES DE DONDE SACA LA INFO DEL QUE ENVIA
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
            READ F-MOVIMIENTOS INVALID KEY GO PSYS-ERR.
            DISPLAY SALDO-DISPLAY.
@@ -298,10 +298,7 @@
            MOVE 0 TO LAST-USER-DST-MOV-NUM.
 
        LECTURA-SALDO-DST.
-       *>The optional AT END clause will – if present – cause imperative-statement-1 to be executed if the READ
-       *>attempt fails due to a file status of 10 (end-of-file). The AT END clause WILL NOT DETECT OTHER NON-ZERO
-       *>FILE-STATUS VALUES. Use a DECLARATIVES routine (section 6.3) or an explicitly-declared file status field
-       *>tested after the READ to detect error conditions other than end-of-file.
+       *> esta operacion busca en bucle 
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO GUARDAR-TRF.
            *>Creo que lo que intenta es que si se encuentra ya al final vaya a guardar la transferencia
            IF MOV-TARJETA = CUENTA-DESTINO THEN
@@ -309,21 +306,25 @@
                IF LAST-USER-DST-MOV-NUM < MOV-NUM THEN
                    MOVE MOV-NUM TO LAST-USER-DST-MOV-NUM
                END-IF
+               *>Last USER-DST-MOV NUM TMA EL VALOR DEL PUNTERO DEL FICHERO
            END-IF.
 
            GO TO LECTURA-SALDO-DST.
-           *> ERROR DETECTADO
-           *> No pueden hacerse transferencias a tarjetas que no se encuentran que no tienen
-           *> movimientos hechos
+
+
        GUARDAR-TRF.
            CLOSE F-MOVIMIENTOS.
            MOVE LAST-USER-DST-MOV-NUM TO MOV-NUM.
+           *>EL PUNTERO AHORA TOMA EL VALOR DE LAST-USER-DST-MOV-NUM
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
            *> Da error porque la cuenta destino no se encuentra registrada en movimientos
            MOVE "F MOVIMIENTOS" TO CHECKERR.
            *> Falla en esta ocasion
-           READ F-MOVIMIENTOS INVALID KEY GO PSYS-ERR.
-
+           READ F-MOVIMIENTOS INVALID KEY GO NO-MONEY.
+           *>PROBLEMA, AL NO ESTAR EN LA LISTA DE MOVIMIENTOS NO SABE
+           *> CALCULAR SU SALDO
+       CALCULO-SALDO-DESTINO-USUARIO.    
+           *>CALCULAMOS EL SALDO DE DESTINO DEL USUARIO
            COMPUTE CENT-SALDO-DST-USER = (MOV-SALDOPOS-ENT * 100)
                                          + MOV-SALDOPOS-DEC.
 
@@ -344,17 +345,20 @@
            MOVE EURENT-USUARIO TO MOV-IMPORTE-ENT.
            MULTIPLY -1 BY EURENT-USUARIO.
            MOVE EURDEC-USUARIO TO MOV-IMPORTE-DEC.
-
+           *> REGISTRAMOS LA TRANSFERENCIA
            MOVE MSJ-ORD        TO MOV-CONCEPTO.
-
+           *> AL SALDO DEL USUARIO LE QUITAMOS EL DINERO QUE VA ENVIAR
            SUBTRACT CENT-IMPOR-USER FROM CENT-SALDO-ORD-USER.
 
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-ORD-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-ORD-USER, 100)
                TO MOV-SALDOPOS-DEC.
            MOVE "F REGISTRO" TO CHECKERR.
+           *>GUARDAMOS EN EL REGISTRO EL MOVIMIENTO DE SALIDA DE
+           *> DINERO DEL QUE HA PAGADO
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
-
+           *> AHORA REGISTRAMOS QUE VAN A ENTRAR DINERITO EN LA OTRA
+           *> CUENTA
            ADD 1 TO LAST-MOV-NUM.
 
            MOVE LAST-MOV-NUM   TO MOV-NUM.
@@ -428,3 +432,9 @@
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Enter - Salir" AT LINE 24 COL 33.
            GO TO EXIT-ENTER.
+
+       NO-MONEY.
+           MOVE 0 TO MOV-SALDOPOS-ENT.
+           MOVE 0 TO MOV-SALDOPOS-DEC.
+           GO TO CALCULO-SALDO-DESTINO-USUARIO.  
+       
