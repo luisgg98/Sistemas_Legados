@@ -137,7 +137,7 @@
            DISPLAY "Numero de tarjeta:" AT LINE 8 COL 15.
            DISPLAY "Inserte el pin de tarjeta:"
                 AT LINE 9 COL 15.
-           ACCEPT DATA-ACCEPT AT 2480 ON EXCEPTION
+           ACCEPT DATA-ACCEPT ON EXCEPTION *> IRENE: delete AT
                IF ESC-PRESSED
                    GO TO IMPRIMIR-CABECERA
                ELSE
