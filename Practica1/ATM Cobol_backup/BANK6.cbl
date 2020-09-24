@@ -312,7 +312,9 @@
            END-IF.
 
            GO TO LECTURA-SALDO-DST.
-
+           *> ERROR DETECTADO
+           *> No pueden hacerse transferencias a tarjetas que no se encuentran que no tienen
+           *> movimientos hechos
        GUARDAR-TRF.
            CLOSE F-MOVIMIENTOS.
            MOVE LAST-USER-DST-MOV-NUM TO MOV-NUM.
@@ -389,8 +391,8 @@
            GO TO EXIT-ENTER.
 
        PSYS-ERR.
-           *>CLOSE TARJETAS.
-           *>CLOSE F-MOVIMIENTOS.
+           CLOSE TARJETAS.
+           CLOSE F-MOVIMIENTOS.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY  "Ha ocurrido un error interno"
