@@ -49,6 +49,8 @@
 
 
        WORKING-STORAGE SECTION.
+       *>> VARIABLE PARA COMPROBAR DONDE ESTA EL ERROR
+       01 CHECKERR                    PIC   X(24).
        77 FST                      PIC   X(2).
        77 FSM                      PIC   X(2).
 
@@ -283,8 +285,9 @@
 
        VERIFICACION-CTA-CORRECTA.
            OPEN I-O TARJETAS.
-           IF FST <> 30
+           IF FST <> 00
               GO TO PSYS-ERR.
+           MOVE "F TARJETA" TO CHECKERR.
 
            MOVE CUENTA-DESTINO TO TNUM-E.
            READ TARJETAS INVALID KEY GO TO USER-BAD.
@@ -295,8 +298,14 @@
            MOVE 0 TO LAST-USER-DST-MOV-NUM.
 
        LECTURA-SALDO-DST.
+       *>The optional AT END clause will – if present – cause imperative-statement-1 to be executed if the READ
+       *>attempt fails due to a file status of 10 (end-of-file). The AT END clause WILL NOT DETECT OTHER NON-ZERO
+       *>FILE-STATUS VALUES. Use a DECLARATIVES routine (section 6.3) or an explicitly-declared file status field
+       *>tested after the READ to detect error conditions other than end-of-file.
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO GUARDAR-TRF.
+           *>Creo que lo que intenta es que si se encuentra ya al final vaya a guardar la transferencia
            IF MOV-TARJETA = CUENTA-DESTINO THEN
+           *>Comprueba la tarjeta de destino tiene un indice en el fichero de movimientos
                IF LAST-USER-DST-MOV-NUM < MOV-NUM THEN
                    MOVE MOV-NUM TO LAST-USER-DST-MOV-NUM
                END-IF
@@ -308,6 +317,9 @@
            CLOSE F-MOVIMIENTOS.
            MOVE LAST-USER-DST-MOV-NUM TO MOV-NUM.
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
+           *> Da error porque la cuenta destino no se encuentra registrada en movimientos
+           MOVE "F MOVIMIENTOS" TO CHECKERR.
+           *> Falla en esta ocasion
            READ F-MOVIMIENTOS INVALID KEY GO PSYS-ERR.
 
            COMPUTE CENT-SALDO-DST-USER = (MOV-SALDOPOS-ENT * 100)
@@ -338,7 +350,7 @@
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-ORD-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-ORD-USER, 100)
                TO MOV-SALDOPOS-DEC.
-
+           MOVE "F REGISTRO" TO CHECKERR.
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
 
            ADD 1 TO LAST-MOV-NUM.
@@ -361,7 +373,7 @@
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-DST-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-DST-USER, 100)
                TO MOV-SALDOPOS-DEC.
-
+           MOVE "F ULTIMO" TO CHECKERR.
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
 
            CLOSE F-MOVIMIENTOS.
@@ -377,8 +389,8 @@
            GO TO EXIT-ENTER.
 
        PSYS-ERR.
-           CLOSE TARJETAS.
-           CLOSE F-MOVIMIENTOS.
+           *>CLOSE TARJETAS.
+           *>CLOSE F-MOVIMIENTOS.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY  "Ha ocurrido un error interno"
@@ -389,6 +401,12 @@
                AT LINE 11 COL 32
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
+
+           DISPLAY CHECKERR AT LINE 14 COL 14.
+           DISPLAY "FSM" AT LINE 15 COL 14.
+           DISPLAY "FST" AT LINE 16 COL 14.
+           DISPLAY FSM AT LINE 15 COL 19.
+           DISPLAY FST AT LINE 16 COL 19.
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
 
        EXIT-ENTER.
