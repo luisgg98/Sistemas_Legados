@@ -276,7 +276,7 @@
 
        ENTER-VERIFICACION.
        *> 24 80
-           ACCEPT PRESSED-KEY AT 2480 ON EXCEPTION
+           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
@@ -417,7 +417,7 @@
 
        EXIT-ENTER.
        *> 24 80
-           ACCEPT PRESSED-KEY AT 2480
+           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
@@ -437,5 +437,6 @@
        NO-MONEY.
            MOVE 0 TO MOV-SALDOPOS-ENT.
            MOVE 0 TO MOV-SALDOPOS-DEC.
-           GO TO CALCULO-SALDO-DESTINO-USUARIO.  
+           GO TO CALCULO-SALDO-DESTINO-USUARIO.
+             
        

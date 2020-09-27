@@ -344,7 +344,7 @@
 
        WAIT-ORDER.
            *> 24 80
-           ACCEPT PRESSED-KEY AT 2480 ON EXCEPTION
+           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
 
               IF ESC-PRESSED THEN
                   CLOSE F-MOVIMIENTOS
@@ -482,7 +482,7 @@
 
        EXIT-ENTER.
            *> ESTABA EN 24 80
-           ACCEPT PRESSED-KEY AT 2480
+           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
