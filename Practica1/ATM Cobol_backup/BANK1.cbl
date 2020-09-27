@@ -189,7 +189,6 @@
                ELSE
                    GO TO PMENUA1.
 
-
            IF CHOICE = 1
                CALL "BANK2" USING TNUM
                GO TO PMENU.

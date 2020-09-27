@@ -67,8 +67,9 @@
            88 UP-ARROW-PRESSED    VALUE  2003.
            88 DOWN-ARROW-PRESSED  VALUE  2004.
 
-       77 LAST-MOV-NUM             PIC  9(35).
-       77 PRESSED-KEY              PIC   9(4).
+       77 LAST-MOV-NUM PIC  9(35).
+       *> 0 RIGHT CORNER NOT SHOWING:
+       77 PRESSED-KEY BLANK ZERO             PIC   9(4).
 
        LINKAGE SECTION.
        77 TNUM                     PIC  9(16).
