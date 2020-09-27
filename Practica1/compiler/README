@@ -1,0 +1,9 @@
+INSTALACION
+
+Extraer gnucobol-3.1-rc1.tar.xz
+Dependiendo del sistema operativo ejecutar el script que corresponda de la carpeta "build_gc3" (Algunos tienen instrucciones especiales que configurar)
+    - Es necesario indicar la carpeta source del compilador con el flag -ssourcefolder.
+
+Ejemplo instalación Ubuntu 20.04.1
+    ./build_gc3_linux.sh -s/home/alberto/Documents/gnucobol-3.1-rc1/
+
