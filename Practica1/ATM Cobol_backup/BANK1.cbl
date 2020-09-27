@@ -73,7 +73,8 @@
 
        77 PRESSED-KEY              PIC  9(4).
        77 PIN-INTRODUCIDO          PIC  9(4).
-       77 CHOICE                   PIC  9(1).
+       *> 0 RIGHT CORNER NOT SHOWING:
+       77 CHOICE BLANK WHEN ZERO   PIC  9(1).
 
 
        SCREEN SECTION.
