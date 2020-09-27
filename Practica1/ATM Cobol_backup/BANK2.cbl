@@ -179,7 +179,7 @@
 
        EXIT-ENTER.
        *> Estaba en 24 80
-           ACCEPT PRESSED-KEY AT 2480
+           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE

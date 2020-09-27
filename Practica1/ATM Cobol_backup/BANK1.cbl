@@ -263,7 +263,7 @@
 
        PINT-ERR-ENTER.
        *>AT LINE 24 COL 80
-           ACCEPT  CHOICE AT 2480 ON EXCEPTION 
+           ACCEPT  CHOICE AT LINE 24 COL 79 ON EXCEPTION 
            IF ENTER-PRESSED
                GO TO IMPRIMIR-CABECERA
            ELSE
@@ -301,7 +301,7 @@
 
        PPIN-ERR-ENTER.
        *> Estaba en 24 80
-           ACCEPT CHOICE AT 2480 ON EXCEPTION
+           ACCEPT CHOICE AT LINE 24 COL 79 ON EXCEPTION
            IF ENTER-PRESSED
                GO TO P2
            ELSE
