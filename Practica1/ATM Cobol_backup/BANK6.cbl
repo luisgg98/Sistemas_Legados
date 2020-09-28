@@ -82,6 +82,8 @@
            88 UP-ARROW-PRESSED   VALUE  2003.
            88 DOWN-ARROW-PRESSED VALUE  2004.
            88 ESC-PRESSED        VALUE  2005.
+           88 F1-PRESSED         VALUE  1001.
+           88 F2-PRESSED         VALUE  1002.
 
        77 PRESSED-KEY              PIC   9(4).
 
@@ -222,7 +224,17 @@
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
-               GO TO INDICAR-CTA-DST
+               IF F1-PRESSED THEN
+                   CALL "MENSUAL_BANK" USING TNUM
+                   GO TO INICIO
+               ELSE
+                   IF F2-PRESSED THEN
+                       CALL "TEMPORAL_BANK" USING TNUM
+                       GO TO INICIO
+                   ELSE
+                       GO TO INDICAR-CTA-DST
+                   END-IF
+               END-IF
            END-IF.
 
            COMPUTE CENT-IMPOR-USER = (EURENT-USUARIO * 100)
@@ -287,7 +299,6 @@
            OPEN I-O TARJETAS.
            IF FST <> 00
               GO TO PSYS-ERR.
-           MOVE "F TARJETA" TO CHECKERR.
 
            MOVE CUENTA-DESTINO TO TNUM-E.
            READ TARJETAS INVALID KEY GO TO USER-BAD.
@@ -318,7 +329,6 @@
            *>EL PUNTERO AHORA TOMA EL VALOR DE LAST-USER-DST-MOV-NUM
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
            *> Da error porque la cuenta destino no se encuentra registrada en movimientos
-           MOVE "F MOVIMIENTOS" TO CHECKERR.
            *> Falla en esta ocasion
            READ F-MOVIMIENTOS INVALID KEY GO NO-MONEY.
            *>PROBLEMA, AL NO ESTAR EN LA LISTA DE MOVIMIENTOS NO SABE
@@ -353,7 +363,6 @@
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-ORD-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-ORD-USER, 100)
                TO MOV-SALDOPOS-DEC.
-           MOVE "F REGISTRO" TO CHECKERR.
            *>GUARDAMOS EN EL REGISTRO EL MOVIMIENTO DE SALIDA DE
            *> DINERO DEL QUE HA PAGADO
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
@@ -379,7 +388,7 @@
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-DST-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-DST-USER, 100)
                TO MOV-SALDOPOS-DEC.
-           MOVE "F ULTIMO" TO CHECKERR.
+
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
 
            CLOSE F-MOVIMIENTOS.
@@ -408,11 +417,6 @@
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
 
-           DISPLAY CHECKERR AT LINE 14 COL 14.
-           DISPLAY "FSM" AT LINE 15 COL 14.
-           DISPLAY "FST" AT LINE 16 COL 14.
-           DISPLAY FSM AT LINE 15 COL 19.
-           DISPLAY FST AT LINE 16 COL 19.
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
 
        EXIT-ENTER.
@@ -435,6 +439,7 @@
        *> ESTO SE HA PUESTO PARA SOLUCIONAR CUANDO UNA TARJETA NO TIENE
        *> MOVIMIENTOS
        NO-MONEY.
+
            MOVE 0 TO MOV-SALDOPOS-ENT.
            MOVE 0 TO MOV-SALDOPOS-DEC.
            GO TO CALCULO-SALDO-DESTINO-USUARIO.
