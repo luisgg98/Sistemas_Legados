@@ -27,9 +27,6 @@
        WORKING-STORAGE SECTION.
        *>> VARIABLE PARA COMPROBAR DONDE ESTA EL ERROR
        77 FST                      PIC   X(2).
-       77 ERROR-FST                      PIC   X(2).
-
-
        78 BLACK                  VALUE      0.
        78 BLUE                   VALUE      1.
        78 GREEN                  VALUE      2.
@@ -69,7 +66,6 @@
        77 PRIMERA-CLAVE-NUEVA             PIC  9(4).
        77 SEGUNDA-CLAVE-NUEVA             PIC  9(4).
 
-
        LINKAGE SECTION.
        77 TNUM                     PIC  9(16).
 
@@ -101,7 +97,6 @@
                AT LINE 8 COL 19
                WITH FOREGROUND-COLOR IS 1.
 
-
            MOVE FUNCTION CURRENT-DATE TO CAMPOS-FECHA.
 
            DISPLAY DIA AT LINE 4 COL 32.
@@ -113,7 +108,6 @@
            DISPLAY ":" AT LINE 4 COL 46.
            DISPLAY MINUTOS AT LINE 4 COL 47.
 
-
        TARJETA-OPEN.
            *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
            OPEN I-O F-TARJETAS CLOSE F-TARJETAS.
@@ -123,7 +117,7 @@
                GO TO PSYS-ERR
            END-IF.
 
-
+       *>LEEMOS LA TARJETA PARA SABER CUAL ES SU CLAVE
        LECTURA-TARJETAS.
            READ F-TARJETAS NEXT RECORD AT END GO TO P2.
            IF TNUM-E = TNUM THEN              
@@ -133,7 +127,7 @@
 
        P2.
            CLOSE F-TARJETAS.
-
+       *>LE DAMOS UN VALOR INICIAL
            INITIALIZE CLAVE-INTRODUCIR.
            INITIALIZE PRIMERA-CLAVE-NUEVA.
            INITIALIZE SEGUNDA-CLAVE-NUEVA.
@@ -154,23 +148,23 @@
                       ELSE
                           GO TO P2.
 
-
+       *>COMPROBAMOS LOS VALORES INTRODUCIDOS
        ESCRIBIR-CLAVE.
-
+       *> LA CLAVE QUE INTRODUCE EL USUARIO Y LA QUE HABIA EN EL
+       *> FICHERON HAN DE COINCIDIR
            IF CLAVE-ANTIGUA <> CLAVE-INTRODUCIR
                GO TO USER-BAD.
-
+       *>COMPRUEBA QUE HAYA ESCRITO LA CLAVE 2 VECES
            IF PRIMERA-CLAVE-NUEVA <> SEGUNDA-CLAVE-NUEVA
                GO TO NO-COINCIDEN-CLAVES.
            
 
            MOVE PRIMERA-CLAVE-NUEVA TO  TPIN-E.
            MOVE TNUM TO TNUM-E.
-           
+       *> ESCRIBE EN EL FICHERO Y COMRPUEBA QUE HAYA SIDO CORRECTO
            OPEN I-O F-TARJETAS.
            REWRITE TARJETAREG.
            IF FST <> 00
-               MOVE FST TO ERROR-FST
                GO TO PSYS-ERR.
            CLOSE F-TARJETAS.
 
@@ -186,7 +180,6 @@
            GO TO EXIT-ENTER.           
 
        ENTER-VERIFICACION.
-       *> 24 80
            ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
@@ -210,7 +203,6 @@
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
 
        EXIT-ENTER.
-       *> 24 80
            ACCEPT PRESSED-KEY AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
@@ -218,13 +210,13 @@
                GO TO EXIT-ENTER.
        
        BACK-ENTER.
-       *> 24 80
            ACCEPT PRESSED-KEY AT LINE 24 COL 79 
            IF ENTER-PRESSED
                GO TO IMPRIMIR-CABECERA
            ELSE
                GO TO BACK-ENTER.
-
+       
+       *> FUNCION QUE INDICA QUE SE HA ESCRITO MAL LA CLAVE
        USER-BAD.
            CLOSE F-TARJETAS.
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
@@ -240,9 +232,7 @@
            DISPLAY "Enter - Salir" AT LINE 24 COL 33.
            GO TO BACK-ENTER.
 
-       *> ESTO SE HA PUESTO PARA SOLUCIONAR CUANDO UNA TARJETA NO TIENE
-       *> MOVIMIENTO
-
+       *> FUNCION QUE INDICA QUE LAS CLAVES NO COINCIDEN
        NO-COINCIDEN-CLAVES.
 
            CLOSE F-TARJETAS.
@@ -261,6 +251,3 @@
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Enter - Salir" AT LINE 24 COL 33.
            GO TO BACK-ENTER.
-
-       *> ESTO SE HA PUESTO PARA SOLUCIONAR CUANDO UNA TARJETA NO TIENE
-       *> MOVIMIENTO

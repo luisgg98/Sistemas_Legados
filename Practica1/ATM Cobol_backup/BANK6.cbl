@@ -443,5 +443,3 @@
            MOVE 0 TO MOV-SALDOPOS-ENT.
            MOVE 0 TO MOV-SALDOPOS-DEC.
            GO TO CALCULO-SALDO-DESTINO-USUARIO.
-             
-       
