@@ -166,7 +166,6 @@
 
        MOVIMIENTOS-OPEN.
 
-
            *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
            OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
 
@@ -176,9 +175,11 @@
            END-IF.
 
        LECTURA-MOVIMIENTOS.
+           *> Se guarda el ultimo movimiento de la tarjeta/cuenta
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO ORDENACION-TRF.
            IF MOV-TARJETA = TNUM THEN
                IF LAST-USER-ORD-MOV-NUM < MOV-NUM THEN
+                   *> Guardo el ultimo mov del usuario
                    MOVE MOV-NUM TO LAST-USER-ORD-MOV-NUM
                END-IF
            END-IF.
@@ -203,6 +204,7 @@
            MOVE LAST-USER-ORD-MOV-NUM TO MOV-NUM.
            *> DE AQUI ES DE DONDE SACA LA INFO DEL QUE ENVIA
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
+           *> Se leen los datos del ultimo movimiento del usuario
            READ F-MOVIMIENTOS INVALID KEY GO PSYS-ERR.
            DISPLAY SALDO-DISPLAY.
            CLOSE F-MOVIMIENTOS.
@@ -219,7 +221,8 @@
 
            COMPUTE CENT-SALDO-ORD-USER = (MOV-SALDOPOS-ENT * 100)
                                          + MOV-SALDOPOS-DEC.
-
+           
+           *> Recoger cuenta y nombre destinatario
            ACCEPT FILTRO-CUENTA ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
@@ -250,6 +253,7 @@
            GO TO REALIZAR-TRF-VERIFICACION.
 
        NO-MOVIMIENTOS.
+           *> No hay movimientos y se muestra saldo 0 
            DISPLAY "0"  AT LINE 10 COL 51.
            DISPLAY "."  AT LINE 10 COL 52.
            DISPLAY "00"  AT LINE 10 COL 53.
@@ -261,11 +265,13 @@
            DISPLAY ","  AT LINE 16 COL 61.
            DISPLAY "EUR"  AT LINE 16 COL 66.
 
+           *> Recoger cuenta y nombre destinatario
            ACCEPT FILTRO-CUENTA ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            END-IF.
-
+           
+           *> Siempre se va a rechazar porque el saldo es 0 !!
            DISPLAY "Indique una cantidad menor!!"
             AT LINE 20 COL 19
             WITH BACKGROUND-COLOR RED.
@@ -273,6 +279,7 @@
            GO TO NO-MOVIMIENTOS.
 
        REALIZAR-TRF-VERIFICACION.
+           *> Si que hay movimientos y se muestra el saldo
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ordenar Transferencia"  AT LINE 08 COL 30.
            DISPLAY "Va a transferir:"  AT LINE 11 COL 19.
@@ -300,6 +307,7 @@
            IF FST <> 00
               GO TO PSYS-ERR.
 
+           *> Comprobar tarjeta destino
            MOVE CUENTA-DESTINO TO TNUM-E.
            READ TARJETAS INVALID KEY GO TO USER-BAD.
            CLOSE TARJETAS.
@@ -309,15 +317,14 @@
            MOVE 0 TO LAST-USER-DST-MOV-NUM.
 
        LECTURA-SALDO-DST.
-       *> esta operacion busca en bucle 
+           *> Buscamos los movimientos de la tarjeta destino para
+           *> encontrar el ultimo saldo
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO GUARDAR-TRF.
-           *>Creo que lo que intenta es que si se encuentra ya al final vaya a guardar la transferencia
            IF MOV-TARJETA = CUENTA-DESTINO THEN
-           *>Comprueba la tarjeta de destino tiene un indice en el fichero de movimientos
                IF LAST-USER-DST-MOV-NUM < MOV-NUM THEN
+                   *> Nos quedamos con el ultimo mov del usuario
                    MOVE MOV-NUM TO LAST-USER-DST-MOV-NUM
                END-IF
-               *>Last USER-DST-MOV NUM TMA EL VALOR DEL PUNTERO DEL FICHERO
            END-IF.
 
            GO TO LECTURA-SALDO-DST.
@@ -326,22 +333,21 @@
        GUARDAR-TRF.
            CLOSE F-MOVIMIENTOS.
            MOVE LAST-USER-DST-MOV-NUM TO MOV-NUM.
-           *>EL PUNTERO AHORA TOMA EL VALOR DE LAST-USER-DST-MOV-NUM
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
-           *> Da error porque la cuenta destino no se encuentra registrada en movimientos
-           *> Falla en esta ocasion
+           *> Si la cuenta destino no tiene mov -> saldo=0
            READ F-MOVIMIENTOS INVALID KEY GO NO-MONEY.
-           *>PROBLEMA, AL NO ESTAR EN LA LISTA DE MOVIMIENTOS NO SABE
-           *> CALCULAR SU SALDO
+
        CALCULO-SALDO-DESTINO-USUARIO.    
-           *>CALCULAMOS EL SALDO DE DESTINO DEL USUARIO
+           *> Calculamos el saldo de la cuenat destino en centimos
            COMPUTE CENT-SALDO-DST-USER = (MOV-SALDOPOS-ENT * 100)
                                          + MOV-SALDOPOS-DEC.
 
            MOVE FUNCTION CURRENT-DATE TO CAMPOS-FECHA.
-
+       
            ADD 1 TO LAST-MOV-NUM.
 
+           *> Preparamos datos para guardar el mov de transferencia
+           *> respecto a la cuenta del ordenante
            MOVE LAST-MOV-NUM   TO MOV-NUM.
            MOVE TNUM           TO MOV-TARJETA.
            MOVE ANO            TO MOV-ANO.
@@ -360,16 +366,16 @@
            *> AL SALDO DEL USUARIO LE QUITAMOS EL DINERO QUE VA ENVIAR
            SUBTRACT CENT-IMPOR-USER FROM CENT-SALDO-ORD-USER.
 
+           *> Se vuelve a calcular cent a euros
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-ORD-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-ORD-USER, 100)
                TO MOV-SALDOPOS-DEC.
-           *>GUARDAMOS EN EL REGISTRO EL MOVIMIENTO DE SALIDA DE
-           *> DINERO DEL QUE HA PAGADO
+           *> Se escribe el movimiento respecto al ordenante
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
-           *> AHORA REGISTRAMOS QUE VAN A ENTRAR DINERITO EN LA OTRA
-           *> CUENTA
+
            ADD 1 TO LAST-MOV-NUM.
 
+           *> Se preparan los datos del mov respecto al receptor
            MOVE LAST-MOV-NUM   TO MOV-NUM.
            MOVE CUENTA-DESTINO TO MOV-TARJETA.
            MOVE ANO            TO MOV-ANO.
@@ -384,6 +390,7 @@
 
            MOVE MSJ-DST        TO MOV-CONCEPTO.
 
+           *> Se aumenta el saldo del receptor y se pasa a EUR
            ADD CENT-IMPOR-USER TO CENT-SALDO-DST-USER.
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-DST-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-DST-USER, 100)
