@@ -215,7 +215,7 @@
            DISPLAY "y nombre del titular"
                 AT LINE 14 COL 19.
            DISPLAY "Indique la cantidad a transferir"
-                AT LINE 16 COL 66.
+                AT LINE 16 COL 19.
            DISPLAY "," AT LINE 16 COL 61.
            DISPLAY "EUR" AT LINE 16 COL 66.
 
