@@ -70,7 +70,7 @@
 
        77 LAST-USER-MOV-NUM        PIC   9(35).
        77 LAST-MOV-NUM             PIC   9(35).
-       *> IRENE ADDED AND CHANGED
+       *> VARIABLE PARA TENER EL TOTAL INGRESADO
        77 EUR-IMPOR-USER          PIC   9(7).
        77 EUR10-USUARIO           PIC    9(3).
        77 EUR20-USUARIO           PIC    9(3).
@@ -95,7 +95,7 @@
 
 
        01 ENTRADA-USUARIO.
-           *> IRENE ADDED AND CHANGED
+           *> CAMPOS ENTRADA PARA LOS DISTINTOS BILLETES
            05 FILLER BLANK ZERO AUTO UNDERLINE
                LINE 13 COL 49 PIC 9(3) USING EUR10-USUARIO.
            05 FILLER BLANK ZERO UNDERLINE
@@ -219,7 +219,7 @@
 
 
        PANTALLA-INGRESO SECTION.
-           *>IRENE ADDED AND CHANGED
+           *>INICIALIZAR LAS VARIABLES 
            INITIALIZE EUR10-USUARIO.
            INITIALIZE EUR20-USUARIO.
            INITIALIZE EUR50-USUARIO.
@@ -231,7 +231,7 @@
            DISPLAY SALDO-DISPLAY.
 
            DISPLAY "Por favor,introduzca billetes"  AT LINE 11 COL 19.
-           *>IRENE ADDED AND CHANGED
+           *>CAMBIADO EL FORMATO DE LA INTERFAZ: PEDIR BILLETES
            DISPLAY "Cantidad billetes de 10 EUR:     "  
                AT LINE 13 COL 19.
            DISPLAY "Cantidad billetes de 20 EUR:     "  
@@ -247,7 +247,7 @@
                    GO TO CONF2
                END-IF.
 
-           *>IRENE ADDED AND CHANGED
+           *>CALCULAR EL TOTAL INTRODUCIDO CADA VEZ QUE PULSAMOS ENTER
            COMPUTE EUR-IMPOR-USER =  (EUR10-USUARIO * 10)
                                     + (EUR20-USUARIO * 20)
                                     + (EUR50-USUARIO * 50).
@@ -283,9 +283,9 @@
            MOVE MINUTOS                 TO MOV-MIN.
            MOVE SEGUNDOS                TO MOV-SEG.
            
-           *>IRENE ADDED
+           *>CAMBIADO EL NOMBRE DE LA VARIABLE
            MOVE EUR-IMPOR-USER         TO MOV-IMPORTE-ENT.
-           *>MOVE EURDEC-USUARIO          TO MOV-IMPORTE-DEC.
+           
 
            MOVE CON                     TO MOV-CONCEPTO.
 
@@ -301,17 +301,15 @@
 
 
        PANT SECTION.
-
-           *>COMPUTE EURENT-USUARIO = (CENT-ACUMULADOR / 100).
-           *>MOVE FUNCTION MOD(CENT-ACUMULADOR, 100)
-           *>    TO EURDEC-USUARIO.
+           *> CALCULAR EL TOTAL ACUMULADO INGRESADO POR EL USUARIO
+           *> EN EUROS
+           COMPUTE EUR-IMPOR-USER = (CENT-ACUMULADOR / 100).
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ingresar efectivo" AT LINE 8 COL 30.
            DISPLAY "Se han recibido correctamente:" AT LINE 10 COL 19.
-           *> IRENE ADDED
+           *> MOSTRAR EL TOTAL ACUMULADO
            DISPLAY EUR-IMPOR-USER AT LINE 10 COL 50.
-           *>DISPLAY EURDEC-USUARIO AT LINE 10 COL 53.
            DISPLAY ".00" AT LINE 10 COL 57.
            DISPLAY "EUR" AT LINE 10 COL 61.
            DISPLAY "El saldo resultante es de:" AT LINE 11 COL 19.
