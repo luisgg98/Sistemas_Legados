@@ -103,6 +103,8 @@
        77 MSJ-ORD                  PIC  X(35) VALUE "Transferimos".
        77 MSJ-DST                  PIC  X(35) VALUE "Nos transfieren".
 
+       77 MSJ-PERIOD               PIC  X(35).
+
        LINKAGE SECTION.
        77 TNUM                     PIC  9(16).
 
@@ -143,6 +145,7 @@
            INITIALIZE LAST-MOV-NUM.
            INITIALIZE LAST-USER-ORD-MOV-NUM.
            INITIALIZE LAST-USER-DST-MOV-NUM.
+           INITIALIZE MSJ-PERIOD.
 
        IMPRIMIR-CABECERA.
 
@@ -175,7 +178,7 @@
            END-IF.
 
        LECTURA-MOVIMIENTOS.
-           *> Se guarda el ultimo movimiento de la tarjeta/cuenta
+           *> Se obtiene el ultimo movimiento de la tarjeta/cuenta
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO ORDENACION-TRF.
            IF MOV-TARJETA = TNUM THEN
                IF LAST-USER-ORD-MOV-NUM < MOV-NUM THEN
@@ -196,6 +199,9 @@
 
            DISPLAY "Enter - Confirmar" AT LINE 24 COL 2.
            DISPLAY "ESC - Cancelar" AT LINE 24 COL 66.
+
+           DISPLAY "F1 - T.Mensual" AT LINE 24 COL 26.
+           DISPLAY "F2 - T.Puntual" AT LINE 24 COL 42.
 
            IF LAST-USER-ORD-MOV-NUM = 0 THEN
                GO TO NO-MOVIMIENTOS
@@ -228,11 +234,13 @@
                EXIT PROGRAM
            ELSE
                IF F1-PRESSED THEN
-                   CALL "MENSUAL_BANK" USING TNUM
+                   MOVE "Mensual" TO MSJ-PERIOD
+                   CALL "PERIOD_BANK" USING TNUM, MSJ-PERIOD
                    GO TO INICIO
                ELSE
                    IF F2-PRESSED THEN
-                       CALL "TEMPORAL_BANK" USING TNUM
+                       MOVE "Puntual" TO MSJ-PERIOD
+                       CALL "PERIOD_BANK" USING TNUM, MSJ-PERIOD
                        GO TO INICIO
                    ELSE
                        GO TO INDICAR-CTA-DST
