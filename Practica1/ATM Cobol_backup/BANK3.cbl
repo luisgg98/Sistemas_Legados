@@ -108,6 +108,7 @@
        01 BLANK-SCREEN.
            05 FILLER LINE 1 BLANK SCREEN BACKGROUND-COLOR BLACK.
 
+       *> Pantalla con campos para filtrar mov por fecha y cantidad
        01 FILTRO-MOVIMIENTOS.
            05 DIA-MIN BLANK ZERO AUTO UNDERLINE
                LINE 13 COL 37 PIC 9(2) USING DIA1-USUARIO.
@@ -133,7 +134,7 @@
                LINE 15 COL 57 PIC 9(2) USING EURDEC2-USUARIO.
 
        01 FILA-MOVIMIENTO-PAR.
-
+           *> Filas pares con letra de color amarillo
            05 MOV-DIA-PAR LINE LINEA-MOV-ACTUAL COL 02
                FOREGROUND-COLOR YELLOW PIC 99 FROM MOV-DIA.
            05 SEPARADOR-PAR-1 LINE LINEA-MOV-ACTUAL COL 04
@@ -273,13 +274,16 @@
 
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
            DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
-
+           
+           *> Recoger datos de filtro de movimientos
            ACCEPT FILTRO-MOVIMIENTOS ON EXCEPTION
                IF ESC-PRESSED
                    EXIT PROGRAM
                ELSE
                    GO TO PCONSULTA-MOV.
-
+           
+           *> Si los campos no se han llenado se pone el maximo para 
+           *> mostrar todos los movimientos
            IF DIA2-USUARIO = 0
                IF MES2-USUARIO = 0
                    IF ANO2-USUARIO = 0
@@ -303,6 +307,7 @@
                    GO TO PSYS-ERR.
 
        POSICIONAR-FINAL.
+           *> Se empieza a leer los movimientos desde el final
            READ F-MOVIMIENTOS NEXT RECORD AT END GO PLECTURA-MOV.
                GO TO POSICIONAR-FINAL.
 
@@ -324,19 +329,24 @@
 
 
        LEER-PRIMEROS.
+           *> Se lee desde el ultimo al primero
            READ F-MOVIMIENTOS PREVIOUS RECORD AT END GO WAIT-ORDER.
                MOVE 1 TO MOV-VALIDO.
 
                PERFORM FILTRADO THRU FILTRADO.
 
+               *> Se ha leido un movimiento valido y 
+               *> se pasa al siguiente
                IF MOV-VALIDO = 1
                    ADD 1 TO LINEA-MOV-ACTUAL
                    ADD 1 TO MOV-EN-PANTALLA
+                   *> Guardo el mov-num en la tabla y lo muestro
                    MOVE MOV-NUM TO
                        REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
                    MOVE 0 TO MOV-VALIDO
                    PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO.
 
+               *> Se muestra solo una cantidad por pantalla y se espera
                IF MOV-EN-PANTALLA = 15
                    GO TO WAIT-ORDER.
 
@@ -364,6 +374,7 @@
            GO TO WAIT-ORDER.
 
        FLECHA-ABAJO.
+           *> Se parte del ultimo guardado para seguir hacia atras
            MOVE REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA) TO MOV-NUM.
            READ F-MOVIMIENTOS INVALID KEY GO WAIT-ORDER.
            GO TO LEER-VIEJO.
@@ -490,10 +501,12 @@
 
 
        FILTRADO.
-
+           
+           *> Comprobar que el movimiento pertenece a su cuenta
            IF TNUM NOT = MOV-TARJETA
                MOVE 0 TO MOV-VALIDO.
 
+           *> Juntar la fecha y comprobar que entra en el rango de fecha
            COMPUTE FECHA-MIN = (ANO1-USUARIO * 10000)
                                + (MES1-USUARIO * 100)
                                + DIA1-USUARIO.
@@ -511,6 +524,7 @@
            IF FECHA-MAX < FECHA-MOV
                MOVE 0 TO MOV-VALIDO.
 
+           *> Pasar a EUR y comprobar que entra en el rango de dinero
            COMPUTE CENT-MIN = (EURENT1-USUARIO * 100)
                               + (EURDEC1-USUARIO).
 
