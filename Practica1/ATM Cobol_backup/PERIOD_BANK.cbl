@@ -219,7 +219,7 @@
            
            DISPLAY "Se va a programar la siguiente transferencia:"
                AT LINE 6 COL 15.
-           *> DISPLAY TRANS-NUM AT LINE 8 COL 20.
+           DISPLAY TRANS-NUM AT LINE 8 COL 20.
            DISPLAY "Ordenante: " AT LINE 10 COL 20.
            DISPLAY TRANS-TARJETA-ORD AT LINE 10 COL 35.
            DISPLAY "Destinatario: " AT LINE 12 COL 20.
