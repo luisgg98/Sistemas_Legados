@@ -280,7 +280,7 @@
            END-IF.
            
            *> Siempre se va a rechazar porque el saldo es 0 !!
-           DISPLAY "Indique una cantidad menor!!"
+           DISPLAY "No hay dinero en la cuenta!!"
             AT LINE 20 COL 19
             WITH BACKGROUND-COLOR RED.
 

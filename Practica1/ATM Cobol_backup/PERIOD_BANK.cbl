@@ -101,7 +101,6 @@
        SCREEN SECTION.
        01 BLANK-SCREEN.
            05 FILLER LINE 1 BLANK SCREEN BACKGROUND-COLOR BLACK.
-           05 FILLER LINE 24 BLANK LINE BACKGROUND-COLOR BLACK.
 
        *> Se recoge la fecha que se quiere hacer la transaccion
        01 DATOS-TRANS.
@@ -124,8 +123,6 @@
        IMPRIMIR-CABECERA.
 
            SET ENVIRONMENT 'COB_SCREEN_EXCEPTIONS' TO 'Y'.
-
-           OPEN I-O TRANSFERENCIAS CLOSE TRANSFERENCIAS.
            
            DISPLAY BLANK-SCREEN.
            DISPLAY "Cajero Automatico UnizarBank"
@@ -187,6 +184,7 @@
           
 
        OPEN-TRANSFERENCIAS.
+           OPEN I-O TRANSFERENCIAS CLOSE TRANSFERENCIAS.
            OPEN I-O TRANSFERENCIAS.
            IF FSTR <> 00 THEN
                GO TO PSYS-ERR
@@ -194,12 +192,12 @@
 
        LEER-ULTIMA-TRANS.
            *> Coger el numero de la ultima transferencia
-           READ TRANSFERENCIAS NEXT RECORD AT END
-            GO TO VERIFICACION-DATOS.
-           IF LAST-TRANS-NUM < TRANS-NUM THEN
-               MOVE TRANS-NUM TO LAST-TRANS-NUM
-           END-IF.
-           GO TO LEER-ULTIMA-TRANS.
+           READ TRANSFERENCIAS NEXT RECORD AT END GO TO 
+               VERIFICACION-DATOS.
+               IF LAST-TRANS-NUM < TRANS-NUM THEN
+                   MOVE TRANS-NUM TO LAST-TRANS-NUM
+               END-IF.
+               GO TO LEER-ULTIMA-TRANS.
 
        VERIFICACION-DATOS.
            *> Preparar datos de la transferencia
@@ -221,7 +219,7 @@
            
            DISPLAY "Se va a programar la siguiente transferencia:"
                AT LINE 6 COL 15.
-           DISPLAY TRANS-NUM AT LINE 8 COL 20.
+           *> DISPLAY TRANS-NUM AT LINE 8 COL 20.
            DISPLAY "Ordenante: " AT LINE 10 COL 20.
            DISPLAY TRANS-TARJETA-ORD AT LINE 10 COL 35.
            DISPLAY "Destinatario: " AT LINE 12 COL 20.
@@ -268,7 +266,7 @@
        EXIT-ENTER.
            DISPLAY "Enter - Salir" AT LINE 24 COL 33.
            ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79.
-           STOP RUN.
+           CLOSE TRANSFERENCIAS.
            EXIT PROGRAM.
 
        DATE-BAD.
