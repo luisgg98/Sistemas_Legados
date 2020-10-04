@@ -159,6 +159,8 @@
            DISPLAY "Indique el importe: " AT LINE 13 COL 20.
            DISPLAY ",   EUR" AT LINE 13 COL 50.
            
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
            *> Recoger datos de la transaccion
            ACCEPT DATOS-TRANS ON EXCEPTION
@@ -243,8 +245,8 @@
            DISPLAY "Tipo: " AT LINE 18 COL 20.
            DISPLAY TRANS-PERIODO AT LINE 18 COL 35.
 
-           DISPLAY "Enter - Aceptar" AT LINE 24 COL 30.
-           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 63.
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
            ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 ON EXCEPTION
            IF ENTER-PRESSED THEN
