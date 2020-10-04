@@ -215,6 +215,7 @@
            DISPLAY SALDO-DISPLAY.
            CLOSE F-MOVIMIENTOS.
 
+
        INDICAR-CTA-DST.
            DISPLAY "Indica la cuenta destino"
                 AT LINE 12 COL 19.
@@ -236,12 +237,12 @@
                IF F1-PRESSED THEN
                    MOVE "Mensual" TO MSJ-PERIOD
                    CALL "PERIOD_BANK" USING TNUM, MSJ-PERIOD
-                   GO TO INICIO
+                   EXIT PROGRAM
                ELSE
                    IF F2-PRESSED THEN
                        MOVE "Puntual" TO MSJ-PERIOD
                        CALL "PERIOD_BANK" USING TNUM, MSJ-PERIOD
-                       GO TO INICIO
+                       EXIT
                    ELSE
                        GO TO INDICAR-CTA-DST
                    END-IF
@@ -303,7 +304,7 @@
 
        ENTER-VERIFICACION.
        *> 24 80
-           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 75  ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
