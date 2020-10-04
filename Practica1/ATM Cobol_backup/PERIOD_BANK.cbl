@@ -81,6 +81,7 @@
        77 PRESSED-KEY              PIC   9(4).
 
        77 TNUM-DST                 PIC   9(16).
+       77 NOMBRE-DESTINO           PIC  X(15).
        77 DIA-TRANS-USUARIO        PIC   9(2).
        77 MES-TRANS-USUARIO        PIC   9(2).
        77 ANO-TRANS-USUARIO        PIC   9(4).
@@ -106,16 +107,18 @@
        01 DATOS-TRANS.
            05 CUENTA-DESTINO BLANK ZERO AUTO UNDERLINE
                LINE 9 COL 47 PIC 9(16) USING TNUM-DST.
+           05 CUENTA-NOMBRE AUTO UNDERLINE
+               LINE 11 COL 54 PIC  X(15) USING NOMBRE-DESTINO.
            05 DIA-TRANS BLANK ZERO AUTO UNDERLINE
-               LINE 11 COL 41 PIC 9(2) USING DIA-TRANS-USUARIO.
+               LINE 13 COL 41 PIC 9(2) USING DIA-TRANS-USUARIO.
            05 MES-TRANS BLANK ZERO AUTO UNDERLINE
-               LINE 11 COL 44 PIC 9(2) USING MES-TRANS-USUARIO.
+               LINE 13 COL 44 PIC 9(2) USING MES-TRANS-USUARIO.
            05 ANO-TRANS BLANK ZERO AUTO UNDERLINE
-               LINE 11 COL 47 PIC 9(4) USING ANO-TRANS-USUARIO.
+               LINE 13 COL 47 PIC 9(4) USING ANO-TRANS-USUARIO.
            05 EUR-ENT BLANK ZERO AUTO UNDERLINE
-               LINE 13 COL 41 PIC 9(7) USING EURENT-USUARIO.
+               LINE 15 COL 41 PIC 9(7) USING EURENT-USUARIO.
            05 EUR-DEC BLANK ZERO UNDERLINE
-               LINE 13 COL 51 PIC 9(2) USING EURDEC-USUARIO.
+               LINE 15 COL 51 PIC 9(2) USING EURDEC-USUARIO.
            
 
 
@@ -142,6 +145,7 @@
        PCONSULTA-TRANS.
            
            INITIALIZE TNUM-DST.
+           INITIALIZE CUENTA-NOMBRE.
            INITIALIZE DIA-TRANS-USUARIO.
            INITIALIZE MES-TRANS-USUARIO.
            INITIALIZE ANO-TRANS-USUARIO.
@@ -155,9 +159,11 @@
            DISPLAY "Transaccion de tipo: " AT LINE 7 COL 20.
            DISPLAY MSJ-PERIOD AT LINE 7 COL 41.
            DISPLAY "Indique la cuenta destino: " AT LINE 9 COL 20.
-           DISPLAY "Indique la fecha:      /  /     " AT LINE 11 COL 20.
-           DISPLAY "Indique el importe: " AT LINE 13 COL 20.
-           DISPLAY ",   EUR" AT LINE 13 COL 50.
+           DISPLAY "Indique el nombre del titular: " AT LINE 11 COL 20.
+           DISPLAY "Indique la fecha:      /  /     " AT LINE 13 COL 20.
+           DISPLAY "Indique el importe: " AT LINE 15 COL 20.
+           DISPLAY ",   EUR" AT LINE 15 COL 50.
+           
            
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
            DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
@@ -226,24 +232,26 @@
            
            DISPLAY "Se va a programar la siguiente transferencia:"
                AT LINE 6 COL 15.
-           DISPLAY TRANS-NUM AT LINE 8 COL 20.
+           *>DISPLAY TRANS-NUM AT LINE 8 COL 20.
            DISPLAY "Ordenante: " AT LINE 10 COL 20.
            DISPLAY TRANS-TARJETA-ORD AT LINE 10 COL 35.
            DISPLAY "Destinatario: " AT LINE 12 COL 20.
            DISPLAY TRANS-TARJETA-DST AT LINE 12 COL 35.
-           DISPLAY "Fecha: " AT LINE 14 COL 20.
-           DISPLAY TRANS-DIA AT LINE 14 COL 35.
-           DISPLAY "/" AT LINE 14 COL 37.
-           DISPLAY TRANS-MES AT LINE 14 COL 38.
-           DISPLAY "/" AT LINE 14 COL 40.
-           DISPLAY TRANS-ANO AT LINE 14 COL 41.
-           DISPLAY "Importe: " AT LINE 16 COL 20.
-           DISPLAY TRANS-IMPORTE-ENT AT LINE 16 COL 35.
-           DISPLAY "," AT LINE 16 COL 42.
-           DISPLAY TRANS-IMPORTE-DEC AT LINE 16 COL 43.
+           DISPLAY "Titular: " AT LINE 14 COL 20.
+           DISPLAY NOMBRE-DESTINO AT LINE 14 COL 35.
+           DISPLAY "Fecha: " AT LINE 16 COL 20.
+           DISPLAY TRANS-DIA AT LINE 16 COL 35.
+           DISPLAY "/" AT LINE 16 COL 37.
+           DISPLAY TRANS-MES AT LINE 16 COL 38.
+           DISPLAY "/" AT LINE 16 COL 40.
+           DISPLAY TRANS-ANO AT LINE 16 COL 41.
+           DISPLAY "Importe: " AT LINE 18 COL 20.
+           DISPLAY TRANS-IMPORTE-ENT AT LINE 18 COL 35.
+           DISPLAY "," AT LINE 18 COL 42.
+           DISPLAY TRANS-IMPORTE-DEC AT LINE 18 COL 43.
            DISPLAY "EUR" AT LINE 18 COL 46.
-           DISPLAY "Tipo: " AT LINE 18 COL 20.
-           DISPLAY TRANS-PERIODO AT LINE 18 COL 35.
+           DISPLAY "Tipo: " AT LINE 20 COL 20.
+           DISPLAY TRANS-PERIODO AT LINE 20 COL 35.
 
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
            DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
@@ -264,8 +272,10 @@
            WRITE TRANSFERENCIA-REG INVALID KEY GO TO PSYS-ERR.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
-           DISPLAY "La transferencia se ha programado correctamente"
-               AT LINE 15 COL 25.
+           DISPLAY "La transferencia se ha programado correctamente."
+               AT LINE 10 COL 17.
+           DISPLAY "Tenga un buen dia."
+               AT LINE 12 COL 31.
 
            ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79.
            EXIT PROGRAM.
