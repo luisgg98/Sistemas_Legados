@@ -440,8 +440,14 @@
                    ADD 1 TO LINEA-MOV-ACTUAL
                    ADD 1 TO MOV-EN-PANTALLA
                    *> Guardo el mov-num en la tabla y lo muestro
-                   MOVE MOV-NUM TO
+                   IF (CHOICE = TIPO-ANTIGUA) THEN
+                       MOVE MOV-NUM TO
                        REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+                   END-IF.
+                   IF (CHOICE = TIPO-PROGRAMADA) THEN
+                       MOVE TRANS-NUM TO
+                       REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+                   END-IF.
                    MOVE 0 TO MOV-VALIDO
                    PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO.
 
@@ -475,7 +481,13 @@
 
        FLECHA-ABAJO.
            *> Se parte del ultimo guardado para seguir hacia atras
-           MOVE REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA) TO MOV-NUM.
+           IF (CHOICE = TIPO-ANTIGUA) THEN
+               MOVE REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA) TO MOV-NUM
+           END-IF.
+           IF (CHOICE = TIPO-PROGRAMADA) THEN
+               MOVE REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA) TO TRANS-NUM
+           END-IF.
+
            IF (CHOICE = TIPO-ANTIGUA) THEN
                READ F-MOVIMIENTOS INVALID KEY GO WAIT-ORDER
            END-IF.
@@ -486,7 +498,13 @@
            GO TO LEER-VIEJO.
 
        FLECHA-ARRIBA.
-           MOVE REGISTROS-EN-PANTALLA(1) TO MOV-NUM.
+           IF (CHOICE = TIPO-ANTIGUA) THEN
+               MOVE REGISTROS-EN-PANTALLA(1) TO MOV-NUM
+           END-IF.
+           IF (CHOICE = TIPO-PROGRAMADA) THEN
+               MOVE REGISTROS-EN-PANTALLA(1) TO TRANS-NUM
+           END-IF.
+           
            IF (CHOICE = TIPO-ANTIGUA) THEN
                READ F-MOVIMIENTOS INVALID KEY GO WAIT-ORDER
            END-IF.
@@ -562,7 +580,13 @@
                ADD 2 TO CONTADOR
            END-PERFORM.
 
-           MOVE MOV-NUM TO REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA).
+           IF (CHOICE = TIPO-ANTIGUA) THEN
+               MOVE MOV-NUM TO REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+           END-IF.
+           IF (CHOICE = TIPO-PROGRAMADA) THEN
+               MOVE TRANS-NUM TO REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+           END-IF.
+           
            PERFORM MOSTRAR-TABLA THRU MOSTRAR-TABLA.
 
            GO TO WAIT-ORDER.
@@ -581,7 +605,12 @@
                SUBTRACT 2 FROM CONTADOR
            END-PERFORM.
 
-           MOVE MOV-NUM TO REGISTROS-EN-PANTALLA(1).
+           IF (CHOICE = TIPO-ANTIGUA) THEN
+               MOVE MOV-NUM TO REGISTROS-EN-PANTALLA(1)
+           END-IF.
+           IF (CHOICE = TIPO-PROGRAMADA) THEN
+               MOVE TRANS-NUM TO REGISTROS-EN-PANTALLA(1)
+           END-IF.
 
            PERFORM MOSTRAR-TABLA THRU MOSTRAR-TABLA.
 
@@ -592,7 +621,12 @@
            MOVE 1 TO CONTADOR.
 
            PERFORM MOV-EN-PANTALLA TIMES
-               MOVE REGISTROS-EN-PANTALLA(CONTADOR) TO MOV-NUM
+               IF (CHOICE = TIPO-ANTIGUA) THEN
+                   MOVE REGISTROS-EN-PANTALLA(CONTADOR) TO MOV-NUM
+               END-IF
+               IF (CHOICE = TIPO-PROGRAMADA) THEN
+                   MOVE REGISTROS-EN-PANTALLA(CONTADOR) TO TRANS-NUM
+               END-IF
                PERFORM READ-MOVIMIENTO THRU READ-MOVIMIENTO
                PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO
                ADD 1 TO LINEA-MOV-ACTUAL
