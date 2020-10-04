@@ -135,7 +135,7 @@
        77 MSJ-MENSUAL-PERIOD        PIC  X(35) VALUE "Mensual".
        77 MSJ-PUNTUAL-PERIOD        PIC  X(35) VALUE "Puntual". 
 
-       77 CHOICE                   PIC  9(1).
+       77 CHOICE   BLANK WHEN ZERO  PIC  9(1).
 
        LINKAGE SECTION.
        77 TNUM                      PIC  9(16).
@@ -409,7 +409,8 @@
 
            DISPLAY "Re. pag - Esp. anteriores" AT LINE 24 COL 2.
            DISPLAY "ESC - Salir" AT LINE 24 COL 33.
-           DISPLAY "Av. pag - Esp. posteriores" AT LINE 24 COL 54.
+           *> SCREEN FIXED
+           DISPLAY "Av. pag - Esp. posteriores" AT LINE 24 COL 50.
 
            MOVE 0 TO MOV-EN-PANTALLA.
            MOVE 7 TO LINEA-MOV-ACTUAL.
@@ -449,7 +450,7 @@
 
        WAIT-ORDER.
            *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79  ON EXCEPTION
 
               IF ESC-PRESSED THEN
                   CLOSE F-MOVIMIENTOS

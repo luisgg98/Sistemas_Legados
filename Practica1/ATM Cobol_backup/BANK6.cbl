@@ -295,15 +295,15 @@
            DISPLAY "."  AT LINE 11 COL 45.
            DISPLAY EURDEC-USUARIO  AT LINE 11 COL 46.
            DISPLAY  "EUR de su cuenta"  AT LINE 11 COL 49.
-           DISPLAY  "a la cuenta cuyo titular es"  AT LINE 12 COL 49.
+           DISPLAY  "a la cuenta cuyo titular es"  AT LINE 12 COL 19.
            DISPLAY  NOMBRE-DESTINO  AT LINE 12 COL 48.
 
            DISPLAY  "Enter - Confirmar"  AT LINE 24 COL 2.
-           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 66.
+           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 62.
 
        ENTER-VERIFICACION.
        *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79  ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
@@ -436,7 +436,7 @@
 
        EXIT-ENTER.
        *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE

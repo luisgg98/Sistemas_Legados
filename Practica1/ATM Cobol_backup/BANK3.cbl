@@ -322,7 +322,8 @@
 
            DISPLAY "Re. pag - Esp. anteriores" AT LINE 24 COL 2.
            DISPLAY "ESC - Salir" AT LINE 24 COL 33.
-           DISPLAY "Av. pag - Esp. posteriores" AT LINE 24 COL 54.
+           *> SCREEN FIXED
+           DISPLAY "Av. pag - Esp. posteriores" AT LINE 24 COL 50.
 
            MOVE 0 TO MOV-EN-PANTALLA.
            MOVE 7 TO LINEA-MOV-ACTUAL.
@@ -354,7 +355,7 @@
 
        WAIT-ORDER.
            *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79  ON EXCEPTION
 
               IF ESC-PRESSED THEN
                   CLOSE F-MOVIMIENTOS
@@ -493,7 +494,7 @@
 
        EXIT-ENTER.
            *> ESTABA EN 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
