@@ -159,6 +159,8 @@
            DISPLAY "Indique el importe: " AT LINE 13 COL 20.
            DISPLAY ",   EUR" AT LINE 13 COL 50.
            
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
            *> Recoger datos de la transaccion
            ACCEPT DATOS-TRANS ON EXCEPTION
@@ -176,12 +178,17 @@
                                        + (MES * 100) 
                                        + (DIA).
 
-           IF FECHA-TOTAL-USUARIO > FECHA-TOTAL-ACTUAL
-               THEN GO TO OPEN-TRANSFERENCIAS
-           ELSE 
-               GO TO DATE-BAD
+           IF FECHA-TOTAL-USUARIO <= FECHA-TOTAL-ACTUAL
+               THEN GO TO DATE-BAD
            END-IF.
-          
+
+           IF (MES-TRANS-USUARIO <= 0 OR MES-TRANS-USUARIO > 12)
+            THEN GO TO DATE-INVALID
+           END-IF.
+
+           IF (DIA-TRANS-USUARIO <= 0 OR DIA-TRANS-USUARIO > 31)
+            THEN GO TO DATE-INVALID
+           END-IF.
 
        OPEN-TRANSFERENCIAS.
            OPEN I-O TRANSFERENCIAS CLOSE TRANSFERENCIAS.
@@ -238,8 +245,8 @@
            DISPLAY "Tipo: " AT LINE 18 COL 20.
            DISPLAY TRANS-PERIODO AT LINE 18 COL 35.
 
-           DISPLAY "Enter - Aceptar" AT LINE 24 COL 30.
-           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 63.
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
            ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 ON EXCEPTION
            IF ENTER-PRESSED THEN
@@ -276,7 +283,14 @@
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
            GO TO EXIT-ENTER.
-
+       
+       DATE-INVALID.
+           PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
+           DISPLAY "La fecha introducida no es valida"
+               AT LINE 9 COL 22
+               WITH FOREGROUND-COLOR IS BLACK
+                    BACKGROUND-COLOR IS RED.
+           GO TO EXIT-ENTER.
 
        PSYS-ERR.
            CLOSE TARJETAS.

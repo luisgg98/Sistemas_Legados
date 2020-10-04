@@ -321,6 +321,9 @@
                AT LINE 8 COL 15.
            DISPLAY "1 - Transferencias anteriores" AT LINE 12 COL 22.
            DISPLAY "2 - Transferencias programadas" AT LINE 14 COL 22.
+           
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
            ACCEPT CHOICE AT LINE 24 COL 80 ON EXCEPTION
                IF ESC-PRESSED
