@@ -212,7 +212,7 @@
            GO TO EXIT-ENTER.           
 
        ENTER-VERIFICACION.
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT PRESSED-KEY AT LINE 24 COL 80  ON EXCEPTION
            IF ESC-PRESSED THEN
                EXIT PROGRAM
            ELSE
@@ -236,14 +236,14 @@
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
        *>FUNCION PARA SALIR DE LA FUNCIONALIDAD
        EXIT-ENTER.
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY AT LINE 24 COL 80 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
                GO TO EXIT-ENTER.
        *>VOLVEMOS A CARGAR LA PANTALLA DE LA FUNCIONALIDAD
        BACK-ENTER.
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY AT LINE 24 COL 80 
            IF ENTER-PRESSED
                GO TO IMPRIMIR-CABECERA
            ELSE
@@ -255,35 +255,37 @@
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ha introducido mal la nueva clave."
                AT LINE 10 COL 19
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Los valores de ambos campos no coinciden."
                AT LINE 12 COL 19
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY "La repetición ha de coincidir con el primer valor."
                AT LINE 14 COL 19
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Enter - Salir" AT LINE 24 COL 33.
 
-               GO TO BACK-ENTER.
+           GO TO BACK-ENTER.
 
        PINT-ERR.
         *>FUNCION QUE INDICA QUE NO SE PUEDE HACER LA TARJETA
+           CLOSE F-TARJETAS.
+           CLOSE INTENTOS.
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Se ha sobrepasado el numero de intentos"
                AT LINE 9 COL 20
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY "Por su seguridad se ha bloqueado la tarjeta"
                AT LINE 11 COL 18
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
                     
            DISPLAY "Acuda a una sucursal"
                AT LINE 12 COL 30
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
 
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
@@ -305,20 +307,20 @@
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "El codigo PIN es incorrecto"
                AT LINE 9 COL 26
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY"Le quedan "
                AT LINE 11 COL 30
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY IINTENTOS
                AT LINE 11 COL 40
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
 
            DISPLAY " intentos"
                AT LINE 11 COL 42 
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
 
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 1.
