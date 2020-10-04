@@ -176,12 +176,17 @@
                                        + (MES * 100) 
                                        + (DIA).
 
-           IF FECHA-TOTAL-USUARIO > FECHA-TOTAL-ACTUAL
-               THEN GO TO OPEN-TRANSFERENCIAS
-           ELSE 
-               GO TO DATE-BAD
+           IF FECHA-TOTAL-USUARIO <= FECHA-TOTAL-ACTUAL
+               THEN GO TO DATE-BAD
            END-IF.
-          
+
+           IF (MES-TRANS-USUARIO <= 0 OR MES-TRANS-USUARIO > 12)
+            THEN GO TO DATE-INVALID
+           END-IF.
+
+           IF (DIA-TRANS-USUARIO <= 0 OR DIA-TRANS-USUARIO > 31)
+            THEN GO TO DATE-INVALID
+           END-IF.
 
        OPEN-TRANSFERENCIAS.
            OPEN I-O TRANSFERENCIAS CLOSE TRANSFERENCIAS.
@@ -276,7 +281,14 @@
                WITH FOREGROUND-COLOR IS BLACK
                     BACKGROUND-COLOR IS RED.
            GO TO EXIT-ENTER.
-
+       
+       DATE-INVALID.
+           PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
+           DISPLAY "La fecha introducida no es valida"
+               AT LINE 9 COL 22
+               WITH FOREGROUND-COLOR IS BLACK
+                    BACKGROUND-COLOR IS RED.
+           GO TO EXIT-ENTER.
 
        PSYS-ERR.
            CLOSE TARJETAS.
