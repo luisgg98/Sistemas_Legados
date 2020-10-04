@@ -79,7 +79,7 @@
        77 SALDO-USUARIO-DEC        PIC    9(2).
        77 CENT-SALDO-USER          PIC  S9(11).
        77 CENT-IMPOR-USER          PIC    9(9).
-       77 CENT-ACUMULADOR          PIC   9(11).
+      *> DELETED CENT-ACUMULADOR
 
        77 CON                      PIC   X(35) VALUE "Ingreso".
        77 PRESSED-KEY BLANK WHEN ZERO  PIC    9(4).
@@ -96,11 +96,11 @@
 
        01 ENTRADA-USUARIO.
            *> CAMPOS ENTRADA PARA LOS DISTINTOS BILLETES
-           05 FILLER BLANK ZERO AUTO UNDERLINE
+           05 BILL10 BLANK ZERO AUTO UNDERLINE
                LINE 13 COL 49 PIC 9(3) USING EUR10-USUARIO.
-           05 FILLER BLANK ZERO UNDERLINE
+           05 BILL20 BLANK ZERO AUTO UNDERLINE
                LINE 15 COL 49 PIC 9(3) USING EUR20-USUARIO.
-           05 FILLER BLANK ZERO UNDERLINE
+           05 BILL50 BLANK ZERO UNDERLINE
                LINE 17 COL 49 PIC 9(3) USING EUR50-USUARIO.
 
        01 SALDO-DISPLAY.
@@ -149,8 +149,6 @@
 
 
        CONSULTA-ULTIMO-MOVIMIENTO SECTION.
-
-           INITIALIZE CENT-ACUMULADOR.
 
            OPEN I-O F-MOVIMIENTOS.
            IF FSM <> 00
@@ -224,7 +222,9 @@
            INITIALIZE EUR20-USUARIO.
            INITIALIZE EUR50-USUARIO.
 
-           DISPLAY "ESC - Finalizar ingreso efectivo"  AT LINE 24 COL 33.
+           *> ENTER ACEPTAR
+           DISPLAY "Enter - Aceptar" AT LINE 24 COL 2.
+           DISPLAY "ESC - Cancelar" AT LINE 24 COL 66.
            DISPLAY "Ingresar efectivo"  AT LINE 8 COL 30.
            DISPLAY "Saldo Actual: "  AT LINE 10 COL 19.
 
@@ -242,21 +242,15 @@
        CONF2.
            ACCEPT ENTRADA-USUARIO ON EXCEPTION
                IF ESC-PRESSED THEN
-                   GO TO PANT
-               ELSE
-                   GO TO CONF2
-               END-IF.
+                   EXIT PROGRAM.
 
            *>CALCULAR EL TOTAL INTRODUCIDO CADA VEZ QUE PULSAMOS ENTER
            COMPUTE EUR-IMPOR-USER =  (EUR10-USUARIO * 10)
                                     + (EUR20-USUARIO * 20)
                                     + (EUR50-USUARIO * 50).
            COMPUTE CENT-IMPOR-USER = EUR-IMPOR-USER * 100.
-           ADD CENT-IMPOR-USER TO CENT-ACUMULADOR.
-
+           *> CENT-ACUMULADOR DELETE
            
-
-
 
 
        INSERTAR-MOVIMIENTO SECTION.
@@ -295,7 +289,9 @@
            WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
            CLOSE F-MOVIMIENTOS.
 
-           GO TO PANTALLA-INGRESO.
+
+           *> DELETED: GO TO PANTALLA-INGRESO.
+           *> PROBLEMA CON ENTER Y ACUMULADOR
 
 
 
@@ -303,7 +299,7 @@
        PANT SECTION.
            *> CALCULAR EL TOTAL ACUMULADO INGRESADO POR EL USUARIO
            *> EN EUROS
-           COMPUTE EUR-IMPOR-USER = (CENT-ACUMULADOR / 100).
+           COMPUTE EUR-IMPOR-USER = (CENT-IMPOR-USER / 100).
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "Ingresar efectivo" AT LINE 8 COL 30.

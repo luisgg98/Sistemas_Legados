@@ -122,7 +122,7 @@
                 AT LINE 24 COL 33.
 
        P1-ENTER. *> Estaba en AT LINE 24 COL 80
-           ACCEPT CHOICE AT LINE 24 COL 80 ON EXCEPTION
+           ACCEPT CHOICE OFF AT LINE 24 COL 80 ON EXCEPTION
            IF ENTER-PRESSED
                GO TO P2
            ELSE
