@@ -185,7 +185,7 @@
            DISPLAY "ESC - Salir" AT LINE 24 COL 34.
 
        PMENUA1. *> Estaba en 24 80) (
-           ACCEPT CHOICE AT LINE 24 COL 80 ON EXCEPTION
+           ACCEPT CHOICE AT LINE 24 COL 79 ON EXCEPTION
                IF ESC-PRESSED
                    GO TO IMPRIMIR-CABECERA
                ELSE

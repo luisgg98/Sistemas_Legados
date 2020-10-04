@@ -325,7 +325,7 @@
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 01.
            DISPLAY "ESC - Cancelar" AT LINE 24 COL 65.
 
-           ACCEPT CHOICE AT LINE 24 COL 80 ON EXCEPTION
+           ACCEPT CHOICE AT LINE 24 COL 79 ON EXCEPTION
                IF ESC-PRESSED
                    EXIT PROGRAM
                ELSE
