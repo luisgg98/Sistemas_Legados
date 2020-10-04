@@ -242,7 +242,7 @@
                    IF F2-PRESSED THEN
                        MOVE "Puntual" TO MSJ-PERIOD
                        CALL "PERIOD_BANK" USING TNUM, MSJ-PERIOD
-                       EXIT
+                       EXIT PROGRAM
                    ELSE
                        GO TO INDICAR-CTA-DST
                    END-IF
