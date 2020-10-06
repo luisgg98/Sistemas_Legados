@@ -291,6 +291,7 @@
 
            *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
            OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
+           OPEN I-O TRANSFERENCIAS CLOSE TRANSFERENCIAS.
            
            SET ENVIRONMENT 'COB_SCREEN_EXCEPTIONS' TO 'Y'
            SET ENVIRONMENT 'COB_SCREEN_ESC'        TO 'Y'
@@ -432,30 +433,30 @@
 
            MOVE 1 TO MOV-VALIDO.
 
-               PERFORM FILTRADO THRU FILTRADO.
+           PERFORM FILTRADO THRU FILTRADO.
 
-               *> Se ha leido un movimiento valido y 
-               *> se pasa al siguiente
-               IF MOV-VALIDO = 1
-                   ADD 1 TO LINEA-MOV-ACTUAL
-                   ADD 1 TO MOV-EN-PANTALLA
-                   *> Guardo el mov-num en la tabla y lo muestro
-                   IF (CHOICE = TIPO-ANTIGUA) THEN
-                       MOVE MOV-NUM TO
-                       REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
-                   END-IF.
-                   IF (CHOICE = TIPO-PROGRAMADA) THEN
-                       MOVE TRANS-NUM TO
-                       REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
-                   END-IF.
-                   MOVE 0 TO MOV-VALIDO
-                   PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO.
+           *> Se ha leido un movimiento valido y 
+           *> se pasa al siguiente
+           IF MOV-VALIDO = 1
+             ADD 1 TO LINEA-MOV-ACTUAL
+             ADD 1 TO MOV-EN-PANTALLA
+             *> Guardo el mov-num en la tabla y lo muestro
+             IF (CHOICE = TIPO-ANTIGUA) THEN
+                 MOVE MOV-NUM TO
+                 REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+             END-IF.
+             IF (CHOICE = TIPO-PROGRAMADA) THEN
+                 MOVE TRANS-NUM TO
+                 REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+             END-IF.
+             MOVE 0 TO MOV-VALIDO
+             PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO.
 
-               *> Se muestra solo una cantidad por pantalla y se espera
-               IF MOV-EN-PANTALLA = 15
-                   GO TO WAIT-ORDER.
+           *> Se muestra solo una cantidad por pantalla y se espera
+           IF MOV-EN-PANTALLA = 15
+             GO TO WAIT-ORDER.
 
-               GO TO LEER-PRIMEROS.
+           GO TO LEER-PRIMEROS.
 
        WAIT-ORDER.
            *> 24 80
