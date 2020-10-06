@@ -1,5 +1,6 @@
+       *>Ejecutar transferencias pendientes
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. BANK10.
+       PROGRAM-ID. BANK10. 
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -137,7 +138,6 @@
 
        PROCEDURE DIVISION.
        INICIO.
-           DISPLAY "HI".
            INITIALIZE TRAN-NUM.
            INITIALIZE CUENTA-DESTINO.
            INITIALIZE CUENTA-ORIGEN.
@@ -156,67 +156,59 @@
            
 
        MOVIMIENTOS-OPEN.
-           DISPLAY "MOVIMIENTOS-OPEN".
            *>FORZAMOS QUE CREE UN FICHERO POR SI NO EXISTE
            OPEN I-O F-MOVIMIENTOS CLOSE F-MOVIMIENTOS.
 
            OPEN I-O F-MOVIMIENTOS.
            IF FSM <> 00 THEN
-               GO TO FIN
+               GO TO PSYS-ERR
            END-IF.
        
        TRANSFERENCIAS-OPEN.
            OPEN I-O TRANSFERENCIAS.
            IF FSTR <> 00 THEN
-               GO TO FIN
+               GO TO PSYS-ERR
            END-IF.
 
        LEER-TRANSFERENCIAS.
-           DISPLAY "+++++++++++++++++++++++++++++++++++++".
-           DISPLAY "LEER TRANSFERENCIAS".
-           *> Se lee desde el ultimo al primero
+           *>Leemos las transferencias
            READ TRANSFERENCIAS NEXT RECORD AT END GO TO FIN.
 
+
+           *>Guardamos los valores de la transferencia leida
            MOVE TRANS-IMPORTE-ENT TO EURENT-USUARIO.
            MOVE TRANS-IMPORTE-DEC TO EURDEC-USUARIO.
            MOVE TRANS-TARJETA-ORD TO CUENTA-ORIGEN. 
            MOVE TRANS-NUM TO TRAN-NUM.
-
-           DISPLAY "Datos transferencia".
-           DISPLAY TRAN-NUM.
-           DISPLAY TRANS-TARJETA-ORD.
-           DISPLAY TRANS-IMPORTE-ENT.
-           DISPLAY TRANS-TARJETA-DST.
-           DISPLAY " ".
-
            MOVE TRANS-TARJETA-DST TO CUENTA-DESTINO.
            MOVE TRANS-PERIODO TO MSJ-PERIOD.
            
+
+           *> Comprobamos que la fecha de la transferencia coincide
+           *> con la fecha del dia que se ejecuta el script
            MOVE 1 TO TRANS-VALIDO.
            
-           
-           *> VER SI FECHA VALIDA
            PERFORM FILTRADO THRU FILTRADO.
            
-           
-
+           *> Si la fecha coincide, se debe ejecutar
+           *> sino, leemos otra transferencia
            IF TRANS-VALIDO = 1
                GO TO TRANSFERENCIA.
           
-           
            GO TO LEER-TRANSFERENCIAS.
 
 
        TRANSFERENCIA.
+           *>Calculamos el importe de la transferencia
            COMPUTE CENT-IMPOR-USER = (EURENT-USUARIO * 100)
                                      + EURDEC-USUARIO.           
            
            GO TO VERIFICACION-CTA-CORRECTA.
-  
-
+ 
 
        FILTRADO.
-           *> Juntar la fecha y comprobar que entra en el rango de fecha
+           *> Juntar la fecha y comprobar que coincide con la fecha 
+           *> actual 
            
            COMPUTE FECHA-TRANS = (TRANS-ANO * 10000)
                                + (TRANS-MES * 100)
@@ -225,10 +217,6 @@
            COMPUTE FECHA-ACTUAL = (ANO * 10000)
                                + (MES * 100)
                                + DIA.
-           DISPLAY "FECHAS".                    
-           DISPLAY FECHA-TRANS.
-           DISPLAY FECHA-ACTUAL.
-           DISPLAY " ".
 
            IF (FECHA-TRANS <> FECHA-ACTUAL) THEN
               MOVE 0 TO TRANS-VALIDO.
@@ -237,7 +225,7 @@
        VERIFICACION-CTA-CORRECTA.
            OPEN I-O TARJETAS.
            IF FST <> 00
-              GO TO FIN.
+              GO TO PSYS-ERR.
            
            *> Comprobar tarjeta origen
            MOVE CUENTA-ORIGEN TO TNUM-E.
@@ -258,10 +246,7 @@
 
          
        LECTURA-SALDO-ORD.
-           *> Se obtiene el ultimo movimiento de la tarjeta/cuenta
-           DISPLAY "MOVIMIENTO NUMERO".
-           DISPLAY MOV-NUM.
-           
+           *>Leemos los movimientos de la cuenta ord, buscamos el ultimo
            MOVE CUENTA-ORIGEN TO MOV-TARJETA. 
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO ENTRE-LECTURAS.
            IF MOV-TARJETA = CUENTA-ORIGEN THEN
@@ -281,39 +266,26 @@
 
            CLOSE F-MOVIMIENTOS.
            
+           *>Leemos el ultimo movimiento de la cuenta ordenante
            MOVE LAST-USER-ORD-MOV-NUM TO MOV-NUM.
            PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
-           *> Si la cuenta destino no tiene mov -> saldo=0
+           *> Si la cuenta origen no tiene mov -> saldo=0
            READ F-MOVIMIENTOS INVALID KEY GO NO-MONEY.
            
-           DISPLAY " ".
-           DISPLAY "LECTURA ULTIMO MOVIMIENTO ORDENANTE"
-           DISPLAY "-------------".
-           DISPLAY MOV-TARJETA.
-           DISPLAY LAST-MOV-NUM.
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-SALDOPOS-ENT.
-
-           DISPLAY "-------------".
-           DISPLAY " ".
-
-           DISPLAY "SALDO ORDENANTE".
-           DISPLAY MOV-TARJETA.
-           DISPLAY CENT-SALDO-ORD-USER.
-
+           *> Obtenemos el saldo de la cuenta ordenante
            COMPUTE CENT-SALDO-ORD-USER = (MOV-SALDOPOS-ENT * 100)
                                      + MOV-SALDOPOS-DEC.
-
-
+           
+           CLOSE F-MOVIMIENTOS.
+           PERFORM MOVIMIENTOS-OPEN THRU MOVIMIENTOS-OPEN.
+           
            MOVE 0 TO MOV-NUM.
            MOVE 0 TO LAST-USER-DST-MOV-NUM.
            MOVE CUENTA-DESTINO TO MOV-TARJETA.
            
 
-
        LECTURA-SALDO-DST.
-           *> Buscamos los movimientos de la tarjeta destino para
-           *> encontrar el ultimo saldo
+           *>Leemos los movimientos de la cuenta ord, buscamos el ultimo
            READ F-MOVIMIENTOS NEXT RECORD AT END GO TO GUARDAR-TRF.
            IF MOV-TARJETA = CUENTA-DESTINO THEN
                IF LAST-USER-DST-MOV-NUM < MOV-NUM THEN
@@ -321,13 +293,10 @@
                    MOVE MOV-NUM TO LAST-USER-DST-MOV-NUM
                END-IF
            END-IF.
-
            GO TO LECTURA-SALDO-DST.
     
 
        GUARDAR-TRF.
-         
-
            CLOSE F-MOVIMIENTOS.
            MOVE LAST-USER-DST-MOV-NUM TO MOV-NUM.
 
@@ -337,29 +306,21 @@
            *> Si la cuenta destino no tiene mov -> saldo=0
            READ F-MOVIMIENTOS INVALID KEY GO NO-MONEY.
            
-           DISPLAY " ".
-           DISPLAY "LECTURA ULTIMO MOVIMIENTO DESTINO"
-           DISPLAY "-------------".
-           DISPLAY MOV-TARJETA.
-           DISPLAY LAST-MOV-NUM.
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-SALDOPOS-ENT.
-
-           DISPLAY "-------------".
-           DISPLAY " ".
-    
        CALCULO-SALDO-DESTINO-USUARIO.   
+           
+           DISPLAY MOV-NUM.
+           DISPLAY MOV-TARJETA.
+           DISPLAY MOV-SALDOPOS-DEC.
+           DISPLAY MOV-SALDOPOS-ENT.
+           DISPLAY " ".
            *> Calculamos el saldo de la cuenta destino en centimos
            COMPUTE CENT-SALDO-DST-USER = (MOV-SALDOPOS-ENT * 100)
                                      + MOV-SALDOPOS-DEC.
            
-           DISPLAY "SALDO DESTINO".
-           DISPLAY CENT-SALDO-DST-USER.
-           DISPLAY " ".
-    
            MOVE FUNCTION CURRENT-DATE TO CAMPOS-FECHA.
 
-       
+           
+           *> MOVIMIENTO DEL ORDENANTE
            ADD 1 TO LAST-MOV-NUM.
 
            *> Preparamos datos para guardar el mov de transferencia
@@ -378,42 +339,22 @@
            MULTIPLY -1 BY EURENT-USUARIO.
            MOVE EURDEC-USUARIO TO MOV-IMPORTE-DEC.
            
-           DISPLAY "MOVIMIENTO ORDENANTE".
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-IMPORTE-ENT.
-           DISPLAY MOV-IMPORTE-DEC.
-           DISPLAY " ".
-
-           *> REGISTRAMOS LA TRANSFERENCIA
            MOVE MSJ-ORD       TO MOV-CONCEPTO.
+
            *> AL SALDO DEL USUARIO LE QUITAMOS EL DINERO QUE VA ENVIAR
-
-           DISPLAY "CALCULO SALDO".
-           DISPLAY CENT-SALDO-ORD-USER.
-           DISPLAY CENT-IMPOR-USER.
            SUBTRACT CENT-IMPOR-USER FROM CENT-SALDO-ORD-USER.
-           DISPLAY CENT-SALDO-ORD-USER.
-           DISPLAY " ".
+         
 
-           *> Se vuelve a calcular cent a euros
+           *> Calculamos euros y los euros restantes
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-ORD-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-ORD-USER, 100)
                TO MOV-SALDOPOS-DEC.
 
-           DISPLAY "ESCRIBO EN ORDENANTE".
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-SALDOPOS-ENT.
-           DISPLAY MOV-SALDOPOS-DEC.
-           DISPLAY " ".
-           *> Se escribe el movimiento respecto al ordenante
-           WRITE MOVIMIENTO-REG INVALID KEY GO TO FIN.
-           DISPLAY "MOVIMIENTO ORDENANTE DONE".
-           DISPLAY " ".
+           *> Se escribe el movimiento del ordenante
+           WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
+           
 
-
-
-
-
+           *> MOVIMIENTO DEL DESTINO
            ADD 1 TO LAST-MOV-NUM.
            *> Se preparan los datos del mov respecto al receptor
            MOVE LAST-MOV-NUM   TO MOV-NUM.
@@ -431,28 +372,18 @@
            MOVE MSJ-DST         TO MOV-CONCEPTO.
     
            *> Se aumenta el saldo del receptor y se pasa a EUR
-
            ADD CENT-IMPOR-USER TO CENT-SALDO-DST-USER.
            COMPUTE MOV-SALDOPOS-ENT = (CENT-SALDO-DST-USER / 100).
            MOVE FUNCTION MOD(CENT-SALDO-DST-USER, 100)
                TO MOV-SALDOPOS-DEC.
            
-           DISPLAY "ESCRIBO EN DESTINO".
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-SALDOPOS-ENT.
-           DISPLAY MOV-SALDOPOS-DEC.
-           DISPLAY " ".
+           *> Escribimos movimiento destino
+           WRITE MOVIMIENTO-REG INVALID KEY GO TO PSYS-ERR.
 
-           WRITE MOVIMIENTO-REG INVALID KEY GO TO FIN.
-
-           DISPLAY "MOVIMIENTO DESTINATARIO DONE".
-            DISPLAY " ".
+          
            CLOSE F-MOVIMIENTOS.
 
-           DISPLAY "TRANSFERENCIA DE TIPO:"
-           DISPLAY MSJ-PERIOD.
-           DISPLAY " ".
-
+           *> Filtramos si transferencia era puntual o mensual
            IF (MSJ-PERIOD = MSJ-PUNTUAL-PERIOD) THEN
                    GO TO TRANSFERENCIA-PUNTUAL.
 
@@ -461,32 +392,35 @@
            
 
        TRANSFERENCIA-PUNTUAL.
-           DISPLAY "HI PUNTUAL".
+           *>BORRAMOS LA TRANSFERENCIA EN EL FICHERO transferencias.ubd
            CLOSE TRANSFERENCIAS.
-            *>BORRAMOS LA TRANSFERENCIA EN EL FICHERO transferencias.ubd
+            
            MOVE TRAN-NUM TO TRANS-NUM.
 
            PERFORM TRANSFERENCIAS-OPEN THRU TRANSFERENCIAS-OPEN.
-           DISPLAY "TRANSFERENCIA".
-           DISPLAY TRANS-NUM.
-           DELETE TRANSFERENCIAS INVALID KEY GO TO FIN.
-           DISPLAY "FIN ESCRITURA".
+         
+           DELETE TRANSFERENCIAS INVALID KEY GO TO PSYS-ERR.
+          
            
            CLOSE F-MOVIMIENTOS.
            CLOSE TRANSFERENCIAS.
            CLOSE TARJETAS.
+           *> Volvemos para leer otra transferencia pendiente
            GO TO TRANSFERENCIAS-OPEN.
 
 
        TRANSFERENCIA-MENSUAL.
-           DISPLAY "HI MENSUAL".
-            *>REESCRIBIMOS LA TRANSFERENCIA EN EL FICHERO transferencias.ubd
+            *>REESCRIBIMOS LA TRANSFERENCIA EN EL 
+            *>FICHERO transferencias.ubd
            CLOSE TRANSFERENCIAS. 
-
+           
+           *> Si es diciembre, reescribimos con los datos de enero
+           *> y ano siguiente
            IF (MES = 12) 
               MOVE 1 TO TRANS-MES
               ADD 1 TO TRANS-ANO.
            
+           *> Si no es diciembre, incrementamos en uno el mes
            IF (MES <> 12) 
                ADD 1 TO TRANS-MES.
 
@@ -494,32 +428,42 @@
            
            PERFORM TRANSFERENCIAS-OPEN THRU TRANSFERENCIAS-OPEN.
           
-           DISPLAY "TRANSFERENCIA".
-           DISPLAY TRANS-NUM.
+           *> REESCRIBIMOS LA TRANSFERENCIA PARA QUE SE HAGA EN EL 
+           *> SIGUIENTE MES
+           REWRITE TRANSFERENCIA-REG INVALID KEY GO PSYS-ERR.
 
-           REWRITE TRANSFERENCIA-REG INVALID KEY GO FIN.
-
-           DISPLAY "FIN ESCRITURA".
            
            CLOSE F-MOVIMIENTOS.
            CLOSE TRANSFERENCIAS.
            CLOSE TARJETAS.
+
+           *> Volvemos para leer otra transferencia pendiente
            GO TO TRANSFERENCIAS-OPEN.
 
            
-       
        NO-MONEY.
            MOVE 0 TO MOV-SALDOPOS-ENT.
            MOVE 0 TO MOV-SALDOPOS-DEC.
            GO TO CALCULO-SALDO-DESTINO-USUARIO.
+
        
        USER-BAD.
            CLOSE TARJETAS.
            MOVE TRANS-NUM TO TRANS-NUM.
-           DELETE TRANSFERENCIAS.   
+           DELETE TRANSFERENCIAS INVALID KEY GO PSYS-ERR.   
       
+
+       PSYS-ERR.
+           CLOSE TRANSFERENCIAS.
+           CLOSE TARJETAS.
+           CLOSE F-MOVIMIENTOS.
+
+           DISPLAY  "Ha ocurrido un error".
+           DISPLAY  "Vuelva mas tarde".
+
        FIN.
-       DISPLAY "HI FIN".
        CLOSE F-MOVIMIENTOS.
        CLOSE TRANSFERENCIAS.
        CLOSE TARJETAS.
+
+       DISPLAY "OK".
