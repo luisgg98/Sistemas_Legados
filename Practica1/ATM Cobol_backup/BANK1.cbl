@@ -75,7 +75,6 @@
 
        77 PRESSED-KEY  BLANK WHEN ZERO  PIC  9(4).
        77 PIN-INTRODUCIDO          PIC  9(4).
-       *> 0 RIGHT CORNER NOT SHOWING:
        77 CHOICE BLANK WHEN ZERO   PIC  9(1).
 
 
@@ -93,6 +92,7 @@
 
        PROCEDURE DIVISION.
        IMPRIMIR-CABECERA.
+           *>MUESTRA LA PANTALLA INICIAL
 
            SET ENVIRONMENT 'COB_SCREEN_EXCEPTIONS' TO 'Y'
            SET ENVIRONMENT 'COB_SCREEN_ESC'        TO 'Y'
@@ -129,7 +129,7 @@
            ELSE
                GO TO P1-ENTER.
 
-
+       
        P2.
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "ESC - Salir" AT LINE 24 COL 33.
@@ -144,23 +144,23 @@
                    GO TO IMPRIMIR-CABECERA
                ELSE
                    GO TO P2.
-
+           *>COMPRUEBA SI LA TARJETA ES VALIDA
            OPEN I-O TARJETAS.
            IF FST NOT = 00 THEN
                GO TO PSYS-ERR.
            READ TARJETAS INVALID KEY GO TO PSYS-ERR.
-
+           *>COMPRUEBA SI AL USUARIO LE QUEDAN INTENTOS 
            OPEN I-O INTENTOS.
            IF FSI NOT = 00 THEN
                GO TO PSYS-ERR.
            MOVE TNUM TO INUM.
 
            READ INTENTOS INVALID KEY GO TO PSYS-ERR.
-
+           *> SI NO LE QUEDAN INTENTOS MUESTRA EL ERROR
            IF IINTENTOS = 0 THEN
                GO TO PINT-ERR.
          
-
+           *> LE INDICA QUE SE HA EQUIVOCADO
            IF PIN-INTRODUCIDO NOT = TPIN THEN
                GO TO PPIN-ERR.
  
@@ -212,9 +212,12 @@
                CALL "BANK7" USING TNUM.
 
            IF CHOICE = 8
-               CALL "BANK8" USING TNUM.
+           *>DE ESTA FORMA CADA VEZ QUE VUELVA COMPROBARA SI LE QUEDAN
+           *> INTENTOS O NO
+               CALL "BANK8" USING TNUM
+               PERFORM CALCULAR-INTENTOS THRU CALCULAR-INTENTOS.
 
-           PERFORM CALCULAR-INTENTOS THRU CALCULAR-INTENTOS.
+           
            GO TO PMENU.
 
 
@@ -261,7 +264,7 @@
 
        PINT-ERR-ENTER.
        *>AT LINE 24 COL 80 
-       *>https://youtu.be/4MB0CmrADaU
+
            ACCEPT PRESSED-KEY OFF AT LINE 24 COL 80 ON EXCEPTION 
            IF ENTER-PRESSED THEN
                GO TO IMPRIMIR-CABECERA
