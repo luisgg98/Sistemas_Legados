@@ -324,5 +324,4 @@
            IF IINTENTOS = 0 THEN
                GO TO IMPRIMIR-CABECERA.
               
-           CLOSE INTENTOS.
-     
+           CLOSE INTENTOS.       
