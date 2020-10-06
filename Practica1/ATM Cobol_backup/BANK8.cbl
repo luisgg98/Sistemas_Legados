@@ -226,11 +226,11 @@
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY  "Ha ocurrido un error interno"
                AT LINE 11 COL 19
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
            DISPLAY  "Vuelva mas tarde"
                AT LINE 12 COL 19
-               WITH FOREGROUND-COLOR IS BLACK
+               WITH FOREGROUND-COLOR IS WHITE
                     BACKGROUND-COLOR IS RED.
 
            DISPLAY "Enter - Aceptar" AT LINE 24 COL 33.
