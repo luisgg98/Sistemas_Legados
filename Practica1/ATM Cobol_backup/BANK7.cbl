@@ -341,7 +341,8 @@
                GO TO LEER-PRIMEROS.
 
        WAIT-ORDER.
-           *> 24 80
+           *> ESTABA EN LA POSICION 24LINE 80 COL ESTO DESPLAZABA TODO
+           *> EL MENU A FUERA HACIENDO QUE SE SALIERA DE LA PANTALLA
            ACCEPT ACCEPT-COMPRA-ENTRADAS ON EXCEPTION
 
               IF ESC-PRESSED THEN
@@ -407,7 +408,7 @@
            DISPLAY HORAS AT LINE 4 COL 44.
            DISPLAY ":" AT LINE 4 COL 46.
            DISPLAY MINUTOS AT LINE 4 COL 47.
-
+           *> SE HA MODIFICADO PARA MOSTRARLO DE FORMA LEGIBLE
            DISPLAY "Compra de entradas de espectaculos" 
                AT LINE 6 COL 22.
            DISPLAY "Vas a comprar    entradas"
@@ -436,6 +437,7 @@
            DISPLAY "EUR"  AT LINE 14 COL 40.
 
            DISPLAY "Enter - Confirmar"  AT LINE 24 COL 2.
+           *>ESTABA EN EL 66, LA R DE CANCELAR NO SE VEIA
            DISPLAY "ESC - Cancelar"  AT LINE 24 COL 65.
 
        SALDO-SUF-ENTER.
