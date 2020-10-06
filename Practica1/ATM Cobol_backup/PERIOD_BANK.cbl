@@ -207,10 +207,10 @@
            *> Coger el numero de la ultima transferencia
            READ TRANSFERENCIAS NEXT RECORD AT END GO TO 
                VERIFICACION-DATOS.
-               IF LAST-TRANS-NUM < TRANS-NUM THEN
-                   MOVE TRANS-NUM TO LAST-TRANS-NUM
-               END-IF.
-               GO TO LEER-ULTIMA-TRANS.
+           IF LAST-TRANS-NUM < TRANS-NUM THEN
+               MOVE TRANS-NUM TO LAST-TRANS-NUM
+           END-IF.
+           GO TO LEER-ULTIMA-TRANS.
 
        VERIFICACION-DATOS.
            *> Preparar datos de la transferencia
@@ -270,6 +270,7 @@
        ESCRIBIR-TRANS.
        *> Escribir en transferencias
            WRITE TRANSFERENCIA-REG INVALID KEY GO TO PSYS-ERR.
+           CLOSE TRANSFERENCIAS.
 
            PERFORM IMPRIMIR-CABECERA THRU IMPRIMIR-CABECERA.
            DISPLAY "La transferencia se ha programado correctamente."
