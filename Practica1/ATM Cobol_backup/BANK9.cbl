@@ -187,9 +187,20 @@
                FOREGROUND-COLOR YELLOW PIC 99 FROM MOV-IMPORTE-DEC.
            05 SEPARADOR-7-PAR LINE LINEA-MOV-ACTUAL COL 63
                FOREGROUND-COLOR YELLOW PIC A FROM "|".
-           05 MOV-TARJETA-PAR LINE LINEA-MOV-ACTUAL COL 64
-               FOREGROUND-COLOR YELLOW PIC 9(16)
-               FROM MOV-TARJETA.
+           05 MOV-SALDOPOS-ENT-IMPAR
+               SIGN IS LEADING SEPARATE
+               LINE LINEA-MOV-ACTUAL COL 64
+               PIC S9(9) FROM MOV-SALDOPOS-ENT.
+           05 SEPARADOR-8-IMPAR LINE LINEA-MOV-ACTUAL COL 74
+               PIC A FROM ",".
+           05 MOV-SALDOPOS-ENT-PAR SIGN IS LEADING SEPARATE
+               LINE LINEA-MOV-ACTUAL COL 64
+               FOREGROUND-COLOR YELLOW PIC S9(9)
+               FROM MOV-SALDOPOS-ENT.
+           05 SEPARADOR-8-PAR LINE LINEA-MOV-ACTUAL COL 74
+               FOREGROUND-COLOR YELLOW PIC A FROM ",".
+           05 MOV-SALDOPOS-DEC-PAR LINE LINEA-MOV-ACTUAL COL 75
+               FOREGROUND-COLOR YELLOW PIC 99 FROM MOV-SALDOPOS-DEC.
 
        01 FILA-MOVIMIENTO-IMPAR.
            05 MOV-DIA-IMPAR LINE LINEA-MOV-ACTUAL COL 02
@@ -218,8 +229,14 @@
                PIC 99 FROM MOV-IMPORTE-DEC.
            05 SEPARADOR-7-IMPAR LINE LINEA-MOV-ACTUAL COL 63
                PIC A FROM "|".
-           05 MOV-TARJETA-IMPAR LINE LINEA-MOV-ACTUAL COL 64
-               PIC  9(16) FROM MOV-TARJETA.
+           05 MOV-SALDOPOS-ENT-IMPAR
+               SIGN IS LEADING SEPARATE
+               LINE LINEA-MOV-ACTUAL COL 64
+               PIC S9(9) FROM MOV-SALDOPOS-ENT.
+           05 SEPARADOR-8-IMPAR LINE LINEA-MOV-ACTUAL COL 74
+               PIC A FROM ",".
+           05 MOV-SALDOPOS-DEC-IMPAR LINE LINEA-MOV-ACTUAL COL 75
+               PIC 99 FROM MOV-SALDOPOS-DEC.
 
        01 FILA-TRANSFERENCIA-PAR.
            *> Filas pares con letra de color amarillo
@@ -281,9 +298,6 @@
                PIC A FROM "|".
            05 TRANS-TARJETA-IMPAR LINE LINEA-MOV-ACTUAL COL 64
                PIC  9(16) FROM TRANS-TARJETA-DST.
-
-
-
 
 
        PROCEDURE DIVISION USING TNUM.
@@ -409,7 +423,13 @@
            DISPLAY "|" AT LINE 7 COL 51.
            DISPLAY "IMPORTE" AT LINE 7 COL 54.
            DISPLAY "|" AT LINE 7 COL 63.
-           DISPLAY "CUENTA DESTINO" AT LINE 7 COL 65.
+           IF (CHOICE = TIPO-ANTIGUA) THEN
+               DISPLAY "SALDO" AT LINE 7 COL 68
+           END-IF.
+           IF (CHOICE = TIPO-PROGRAMADA) THEN
+               DISPLAY "CUENTA DESTINO" AT LINE 7 COL 65
+           END-IF. 
+           
 
            DISPLAY "Re. pag - Esp. anteriores" AT LINE 24 COL 2.
            DISPLAY "ESC - Salir" AT LINE 24 COL 33.
@@ -437,20 +457,21 @@
 
            *> Se ha leido un movimiento valido y 
            *> se pasa al siguiente
-           IF MOV-VALIDO = 1
+           IF MOV-VALIDO = 1 THEN
              ADD 1 TO LINEA-MOV-ACTUAL
              ADD 1 TO MOV-EN-PANTALLA
              *> Guardo el mov-num en la tabla y lo muestro
              IF (CHOICE = TIPO-ANTIGUA) THEN
                  MOVE MOV-NUM TO
                  REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
-             END-IF.
+             END-IF
              IF (CHOICE = TIPO-PROGRAMADA) THEN
                  MOVE TRANS-NUM TO
-                 REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
-             END-IF.
+                   REGISTROS-EN-PANTALLA(MOV-EN-PANTALLA)
+             END-IF
              MOVE 0 TO MOV-VALIDO
-             PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO.
+             PERFORM MOSTRAR-MOVIMIENTO THRU MOSTRAR-MOVIMIENTO
+           END-IF.
 
            *> Se muestra solo una cantidad por pantalla y se espera
            IF MOV-EN-PANTALLA = 15
@@ -702,6 +723,7 @@
            COMPUTE FECHA-MAX = (ANO2-USUARIO * 10000)
                                + (MES2-USUARIO * 100)
                                + DIA2-USUARIO.
+
            IF (CHOICE = TIPO-ANTIGUA) THEN
                IF FECHA-MIN > FECHA-MOV THEN
                    MOVE 0 TO MOV-VALIDO
