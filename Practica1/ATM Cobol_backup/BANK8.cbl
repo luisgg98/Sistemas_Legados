@@ -106,7 +106,7 @@
                WITH FOREGROUND-COLOR IS 1.
 
            DISPLAY "Cambio de clave personal"
-               AT LINE 8 COL 19
+               AT LINE 7 COL 19
                WITH FOREGROUND-COLOR IS 1.
 
            MOVE FUNCTION CURRENT-DATE TO CAMPOS-FECHA.

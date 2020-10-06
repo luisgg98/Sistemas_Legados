@@ -89,7 +89,7 @@
            88 UP-ARROW-PRESSED      VALUE 2003.
            88 DOWN-ARROW-PRESSED    VALUE 2004.
            88 ESC-PRESSED           VALUE 2005.
-       77 PRESSED-KEY               PIC   9(4).
+       77 PRESSED-KEY   BLANK WHEN ZERO            PIC   9(4).
 
        77 USER-NUM-ENTRADAS         PIC   9(2).
        77 USER-NUM-ESPECT           PIC   9(4).
@@ -198,7 +198,7 @@
            05 FILLER LINE LINEA-ESP-ACTUAL COL 23
                VALUE "|".
            05 FILLER LINE LINEA-ESP-ACTUAL COL 24
-               PIC X(40) FROM ESP-DESCR.
+               PIC X(80) FROM ESP-DESCR.
            05 FILLER LINE LINEA-ESP-ACTUAL COL 64
                VALUE "|".
            05 FILLER LINE LINEA-ESP-ACTUAL COL 65
@@ -342,7 +342,7 @@
 
        WAIT-ORDER.
            *> 24 80
-           ACCEPT ACCEPT-COMPRA-ENTRADAS AT LINE 24 COL 79  ON EXCEPTION
+           ACCEPT ACCEPT-COMPRA-ENTRADAS ON EXCEPTION
 
               IF ESC-PRESSED THEN
                   CLOSE F-MOVIMIENTOS
@@ -413,19 +413,19 @@
            DISPLAY "Vas a comprar    entradas"
                 AT LINE 8 COL 15.
            DISPLAY USER-NUM-ENTRADAS
-            AT LINE 8 COL 19.
-           DISPLAY "del espectaculo"  AT LINE 9 COL 15.
-           DISPLAY ESP-DESCR  AT LINE 9 COL 31.
-           DISPLAY "con fecha"  AT LINE 10 COL 15.
-           DISPLAY ESP-DIA  AT LINE 10 COL 25.
-           DISPLAY "-"  AT LINE 10 COL 27.
-           DISPLAY ESP-MES  AT LINE 10 COL 28.
-           DISPLAY "-"  AT LINE 10 COL 30.
-           DISPLAY ESP-ANO  AT LINE 10 COL 31.
-           DISPLAY "a las"  AT LINE 11 COL 15.
-           DISPLAY ESP-HOR  AT LINE 11 COL 21.
-           DISPLAY ":"  AT LINE 11 COL 23.
-           DISPLAY ESP-MIN  AT LINE 11 COL 24.
+            AT LINE 8 COL 29.
+           DISPLAY "del espectaculo:"  AT LINE 8 COL 41.
+           DISPLAY ESP-DESCR  AT LINE 9 COL 15.
+           DISPLAY "con fecha"  AT LINE 11 COL 15.
+           DISPLAY ESP-DIA  AT LINE 11 COL 25.
+           DISPLAY "-"  AT LINE 11 COL 27.
+           DISPLAY ESP-MES  AT LINE 11 COL 28.
+           DISPLAY "-"  AT LINE 11 COL 30.
+           DISPLAY ESP-ANO  AT LINE 11 COL 31.
+           DISPLAY "a las"  AT LINE 11 COL 36.
+           DISPLAY ESP-HOR  AT LINE 11 COL 42.
+           DISPLAY ":"  AT LINE 11 COL 43.
+           DISPLAY ESP-MIN  AT LINE 11 COL 44.
            DISPLAY "Codigo del espectaculo: "  AT LINE 12 COL 15.
            DISPLAY ESP-NUM  AT LINE 12 COL 39.
 
@@ -436,7 +436,7 @@
            DISPLAY "EUR"  AT LINE 14 COL 40.
 
            DISPLAY "Enter - Confirmar"  AT LINE 24 COL 2.
-           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 66.
+           DISPLAY "ESC - Cancelar"  AT LINE 24 COL 65.
 
        SALDO-SUF-ENTER.
        *> estaba en 24 y 80
