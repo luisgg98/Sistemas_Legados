@@ -308,11 +308,7 @@
            
        CALCULO-SALDO-DESTINO-USUARIO.   
            
-           DISPLAY MOV-NUM.
-           DISPLAY MOV-TARJETA.
-           DISPLAY MOV-SALDOPOS-DEC.
-           DISPLAY MOV-SALDOPOS-ENT.
-           DISPLAY " ".
+         
            *> Calculamos el saldo de la cuenta destino en centimos
            COMPUTE CENT-SALDO-DST-USER = (MOV-SALDOPOS-ENT * 100)
                                      + MOV-SALDOPOS-DEC.
