@@ -335,7 +335,7 @@
 
        EXIT-ENTER.
        *> ESTABA EN 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE

@@ -442,7 +442,7 @@
 
        SALDO-SUF-ENTER.
        *> estaba en 24 y 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED THEN
                GO TO GUARDAR-VENTA
            ELSE
@@ -502,7 +502,7 @@
 
        RECOGER-ENTER.
        *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
@@ -539,7 +539,7 @@
 
        VENTA-ERR-ENTER.
        *> 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                CLOSE F-MOVIMIENTOS
                CLOSE F-ESPECTACULOS
@@ -667,7 +667,7 @@
 
        EXIT-ENTER.
         *> ESTABA EN 24 80
-           ACCEPT PRESSED-KEY AT LINE 24 COL 79 
+           ACCEPT PRESSED-KEY OFF AT LINE 24 COL 79 
            IF ENTER-PRESSED
                EXIT PROGRAM
            ELSE
