@@ -103,7 +103,7 @@
           DISPLAY BLANK-SCREEN.
            DISPLAY "Cajero Automatico UnizarBank"
                AT LINE 2 COL 26
-               WITH FOREGROUND-COLOR IS 1.
+               WITH FOREGROUND-COLOR IS CYAN.
 
            DISPLAY "Cambio de clave personal"
                AT LINE 7 COL 19

@@ -99,7 +99,7 @@
 
            DISPLAY BLANK-SCREEN.
            DISPLAY "Cajero Automatico UnizarBank" AT LINE 2 COL 26
-               WITH FOREGROUND-COLOR IS BLUE.
+               WITH FOREGROUND-COLOR IS CYAN.
 
            MOVE FUNCTION CURRENT-DATE TO CAMPOS-FECHA.
            *> Cambiado al formato de cobol Standard
