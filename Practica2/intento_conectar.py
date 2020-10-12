@@ -3,6 +3,8 @@ from py3270 import Emulator
 #Web de la biblioteca
 # https://www.suhendro.com/2019/11/ibm-3270-screen-scraping-and-automation/
 
+# https://github.com/py3270/py3270
+
 # use x3270 so you can see what is going on
 em = Emulator(visible=True)
 
