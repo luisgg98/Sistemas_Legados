@@ -16,7 +16,7 @@ em = Emulator(visible=True)
 #connect(host):
     #Description: Connect to a host
     #host (string): host name or IP address
-em.connect('155.210.152.51:3270')
+em.connect('155.210.152.51:104')
 
 #exec_command(cmdstr):
     #Description: Execute an x3270 command 'cmdstr' gets sent directly to the x3270 subprocess on it is stdin.
@@ -30,7 +30,7 @@ em.connect('155.210.152.51:3270')
     #Arguments:
     #cmdstr (string): x3270 command
 
-#wait_for_field():
+em.wait_for_field()
     #Description: Wait until the screen is ready, the cursor has been positioned on a modifiable field, and the keyboard is unlocked. Sometimes the server will "unlock" the keyboard but the screen will not yet be ready. In that case, an attempt to read or write to the screen will result in a 'E' keyboard status because we tried to read from a screen that is not yet ready. Using this method tells the client to wait until a field is detected and the cursor has been positioned on it.
     #Arguments: none
     # if your host unlocks the keyboard before truly being ready you can use:
@@ -46,8 +46,8 @@ em.connect('155.210.152.51:3270')
     #ypos (int): y position (row number)
     #xpos (int): x position (column number)
     #length (int): length of the string
-dato= em.string_get(1,1,14)
-print dato
+dato= em.string_get(3,1,50)
+print(dato)
 
 #string_found(ypos, xpos, string):
 #Description: Return True if 'string' is found at screen coordinates 'ypos'/'xpos', False otherwise. Coordinates are 1 based, as listed in the status area of the terminal.
@@ -56,7 +56,7 @@ print dato
 #xpos (int): x position (column number)
 #length (int): length of the string
 encuentro_algo= em.string_found(14,14,"HHHHHHH")
-print encuentro_algo
+print(encuentro_algo)
 
 #move_to(ypos, xpos):
 #Description: move the cursor to the given coordinates. Coordinates are 1 based, as listed in the status area of the terminal.
@@ -89,9 +89,9 @@ em.move_to(7,7)
 #Arguments:
 #file_path (string): file path and name
 #Guarda la pantalla en el formato que le pongas
-em.save_screen("/home/luisgg/Documents/Sistemas_Legados/practicas/Sistemas_Legados/file.txt")
-em.save_screen("/home/luisgg/Documents/Sistemas_Legados/practicas/Sistemas_Legados/file.html")
-em.save_screen("/home/luisgg/Documents/Sistemas_Legados/practicas/Sistemas_Legados/file")
+em.save_screen("/home/irene/Documentos/legados/p2/file.txt")
+em.save_screen("/home/irene/Documentos/legados/p2/file.html")
+em.save_screen("/home/irene/Documentos/legados/p2/file")
 
 
 #terminate():
