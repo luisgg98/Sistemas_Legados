@@ -1,10 +1,91 @@
 from py3270 import Emulator
+import os.path
 import time
 
-#Espera activa para que pantalla este preparada
+
 def __waitScreen():
-    while em.string_get(1,2,1) == " ":
-        pass
+    time.sleep(3)
+
+
+class Wrapper:
+    __fichero="/home/luisgg/Documents/Sistemas_Legados/practicas/Sistemas_Legados/Practica2/file.html"
+    em=Emulator(visible=True)
+    __mainframe='155.210.152.51:104'
+
+    def iniciar(self):       
+        self.em.connect(self.__mainframe)
+        self.em.send_enter()
+        time.sleep(2)
+        self.em.fill_field(3,18,'grupo_04',8)
+        self.em.fill_field(5,18,'secreto6',8)
+        self.em.send_enter()
+        time.sleep(3)
+        self.em.send_enter()
+        time.sleep(3)
+        self.em.fill_field(3,15,'tareas.c',8)
+        self.em.send_enter()
+
+    def exitMainFrame(self):
+        self.em.send_string('3', ypos=None, xpos=None)
+        self.em.send_enter()
+        self.em.send_enter()
+        self.em.terminate()
+
+    def mainMenu(self):
+        self.em.send_string('3', ypos=None, xpos=None)
+        self.em.send_enter()
+
+    def assignTask(self):
+        self.em.send_string('1', ypos=None, xpos=None)
+        self.em.send_enter()
+
+    def viewTask(self):
+        self.em.send_string('2', ypos=None, xpos=None)
+        self.em.send_enter()
+
+    def viewSpecificTask(self):
+        self.viewTask()
+        self.em.send_string('2', ypos=None, xpos=None)
+        self.em.send_enter()
+        #Falta por completar
+
+    def viewGeneralTask(self):
+        self.viewTask()
+        self.em.send_string('1', ypos=None, xpos=None)
+        self.em.send_enter()
+        #Falta por completar
+    
+
+    def generalTask(self,date,description):
+        self.assignTask()
+        self.em.send_string('1', ypos=None, xpos=None)
+        self.em.send_enter()
+        self.em.send_string(date, ypos=None, xpos=None)
+        self.em.send_enter()
+        self.em.send_string(description, ypos=None, xpos=None)
+        self.em.send_enter()
+        self.mainMenu()
+
+    #Se ha vuelto loco
+    def specificTask(self,date,name,description):
+        self.assignTask()
+        self.em.send_string('2', ypos=None, xpos=None)
+        self.em.send_enter()
+        self.em.send_string(date, ypos=None, xpos=None)
+        self.em.send_enter()
+        self.em.send_string(name, ypos=None, xpos=None)
+        self.em.send_enter()        
+        self.em.send_string(description, ypos=None, xpos=None)
+        self.em.send_enter()
+        self.mainMenu()
+
+  
+
+
+
+
+
+
 
 
 #IMPORTANTE: HACER ESTO EN UNA FUNCION, ES UNA API
@@ -13,28 +94,18 @@ def __waitScreen():
     #todo lo de abajo
 
 #em = Emulator()
-em = Emulator(visible=True)
-em.connect('155.210.152.51:104')
-em.send_enter()
+wrapero = Wrapper()
+wrapero.iniciar()
+wrapero.assignTask()
+time.sleep(3)
+wrapero.specificTask("2134","Bd","Aprobar")
 
-__waitScreen()
-print(em.string_get(3,1,17))
-em.fill_field(3,18,'grupo_04',8)
-em.fill_field(5,18,'secreto6',8)
-em.send_enter()
-__waitScreen()
-print(em.string_get(41,1,17))
-em.send_enter()
-while em.string_get(1,2,1) == "U":
-        pass
 
-em.save_screen("/home/irene/Documentos/legados/p2/file.html")
-print(em.string_get(1,1,17))
-print(em.string_get(3,1,13))
-em.fill_field(3,15,'tareas.c',8)
-em.send_enter()
-__waitScreen()
+wrapero.viewSpecificTask()
 #Tenemos que esperar a que cargue todo lo de ejecutar tareas.c -> (sleep?)
-time.sleep(2)
-em.save_screen("/home/irene/Documentos/legados/p2/file.html")
-em.terminate()
+
+time.sleep(10)
+wrapero.mainMenu()
+time.sleep(10)
+wrapero.exitMainFrame()
+
