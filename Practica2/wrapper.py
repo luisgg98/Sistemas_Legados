@@ -2,15 +2,33 @@ from py3270 import Emulator
 import os.path
 import time
 
-
 class Wrapper:
     #Atributos de la clase
-    __fichero="/home/luisgg/Documents/Sistemas_Legados/practicas/Sistemas_Legados/Practica2/file.html"
-    em=Emulator(visible=True)
+    em=Emulator(visible=False)
     __mainframe='155.210.152.51:103'
-    timeout=1
+    timeout=0.25
+    __grupo='grupo_04'
+    __password='secreto6'
 
-    #Funcion para iniciar la conexión, iniciar sesion y ejecutar
+    def fechasTruncate(self,date):
+        lista_date=date.split('/')
+        date= lista_date[0] + lista_date[1]
+        return date
+
+    def descriptionTruncate(self,description): 
+        description = description.replace(" ", "_") 
+        if len(description) > 12:
+            description=description[0:11]
+ 
+        return description
+
+    def nameTruncate(self,name):
+        name= name.replace(" ", "_")
+        if len(name) > 5:
+            name=name[0:4]  
+        return name
+
+    #Funcion para iniciar la conexion, iniciar sesion y ejecutar
     #   tareas.c
     def iniciar(self):       
         self.em.connect(self.__mainframe)
@@ -19,8 +37,8 @@ class Wrapper:
         self.em.wait_for_field()
         time.sleep(self.timeout)
 
-        self.em.fill_field(3,18,'grupo_04',8)
-        self.em.fill_field(5,18,'secreto6',8)
+        self.em.fill_field(3,18,self.__grupo,8)
+        self.em.fill_field(5,18,self.__password,8)
         self.em.send_enter()
         self.em.wait_for_field()
         time.sleep(self.timeout)
@@ -35,20 +53,16 @@ class Wrapper:
         time.sleep(self.timeout)
 
 
-
     #Funcion interna para comprobar si abajo a la derecha aparece "More"
     #   si True, aparece y pulsa enter
     def isMore(self):
         m = self.em.string_get(43,71,4)
         if m == "More":
-            print("More")
+            #print("More")
             self.em.send_enter()
             self.em.wait_for_field()
             time.sleep(self.timeout)
             #time.sleep(3)
-
-
-
 
     #Termina la ejecucion de tareas.c y vuelve al menu principal del
     #   mainframe. 
@@ -65,15 +79,13 @@ class Wrapper:
         time.sleep(self.timeout)
         self.em.terminate()
 
-
-
     #Volver al menu principal
     def mainMenu(self):
         self.isMore()
         self.em.send_string('3', ypos=None, xpos=None)
         self.em.send_enter()
-        time.sleep(3)
-
+        self.em.wait_for_field()
+        time.sleep(self.timeout)        
 
 
     #Desde el menu principal, avanza a la operacion "Crear tarea"
@@ -81,13 +93,16 @@ class Wrapper:
         self.isMore()
         self.em.send_string('1', ypos=None, xpos=None)
         self.em.send_enter()
-
-
+        self.em.wait_for_field()
+        time.sleep(self.timeout)
 
     #INTRODUCIR NUEVA TAREA GENERAL
     #   IN:     fecha, nombre
     #   OUT:    nada
     def generalTask(self,date,description):
+        date=self.fechasTruncate(date)
+        description=self.descriptionTruncate(description)
+
         self.assignTask()
         self.isMore()
         self.em.send_string('1', ypos=None, xpos=None)
@@ -109,14 +124,15 @@ class Wrapper:
         
         self.mainMenu()
 
-
-
     #INTRODUCIR NUEVA TAREA ESPECIFICA
     #   IN:     fecha, nombre, descripcion
     #   OUT:    nada
     def specificTask(self,date,name,description):
+        date=self.fechasTruncate(date)
+        description=self.descriptionTruncate(description)
+        name=self.nameTruncate(name)
+
         self.assignTask()
-        #time.sleep(2)
         self.isMore()
         self.em.send_string('2', ypos=None, xpos=None)
         self.em.send_enter()
@@ -145,7 +161,6 @@ class Wrapper:
         self.mainMenu()
 
 
-
     #Desde el menu principal, avanza a la operacion "Ver tarea"
     def viewTask(self):
         self.isMore()
@@ -153,8 +168,6 @@ class Wrapper:
         self.em.send_enter()
         self.em.wait_for_field()
         time.sleep(self.timeout)
-
-
 
     #Funcion interna para leer las tareas presentes en una pantalla
     #   Nota: en caso de estar mostrando dos veces la lista en la 
@@ -166,7 +179,9 @@ class Wrapper:
             isTask=self.em.string_found(i,1,'TASK')
             if isTask:
                 isTipo=self.em.string_found(i,9,tipo)
-                if isTipo:
+                isTipo2=self.em.string_found(i,10,tipo)
+                isTipo3=self.em.string_found(i,11,tipo)
+                if isTipo or isTipo2 or isTipo3:
                     newTask=self.em.string_get(i,1,80)
                     if newTask in list:
                         pass
@@ -180,17 +195,18 @@ class Wrapper:
 
     #FUNCION que convierte a lista de listas para devolver a frontend en 
     #   el formato acordado
-    def listOfLists(self,lista):
+    def listOfLists(self, lista):
         result=list()
         for tarea in lista:
             contenido=tarea.split(' ')
+            contenido[5]=contenido[5].replace("_", " ")
+            contenido[4]=contenido[4].replace("_", " ")
             info=contenido[3:6]
             nTarea=contenido[1].split(':')
             nTarea=nTarea[0]
             newTarea=[nTarea]+info
             result.append(newTarea)
         return result
-
 
     #LISTAR TAREAS GENERALES
     #   IN:     sin argumentos
@@ -204,9 +220,7 @@ class Wrapper:
         self.em.send_string('1', ypos=None, xpos=None)
         self.em.send_enter()
         self.em.wait_for_field()
-        time.sleep(self.timeout)
-
-       
+        time.sleep(self.timeout)       
         tareas=list()
         #simulamos do while
         while True:
@@ -221,15 +235,12 @@ class Wrapper:
                 self.em.wait_for_field()
                 time.sleep(self.timeout)
         print("estoy fuera")
-        print(tareas)
-
+        #print(tareas)
         #Convertimos a lista de listas
         result=self.listOfLists(tareas)
         self.mainMenu()
 
         return result
-
-
 
     #LISTAR TAREAS ESPECIFICAS
     #   IN:     sin argumentos
@@ -257,18 +268,13 @@ class Wrapper:
                 self.em.wait_for_field()
                 time.sleep(self.timeout)
         print("estoy fuera")
-        print(tareas)
-
+        #print(tareas)
         #Convertimos a lista de listas
         result=self.listOfLists(tareas)
 
         self.mainMenu()
 
         return result
-
-
-
-    
 
 
 #IMPORTANTE: HACER ESTO EN UNA FUNCION, ES UNA API
@@ -289,16 +295,54 @@ time.sleep(3)
 
 #wrapero.viewGeneralTask()
 
-wrapero.specificTask("2134","A","Aprr")
-wrapero.specificTask("2134","B","Aprob")
-wrapero.specificTask("2134","C","Aprob")
-wrapero.specificTask("2134","D","ok")
-wrapero.specificTask("2134","E","ok")
-wrapero.specificTask("2134","F","ok")
-time.sleep(3)
-r=wrapero.viewSpecificTask()
+tarea=0
+while tarea < 10:
+    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
+    tarea = tarea + 1 
+
+      
+while tarea < 20:
+    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
+    tarea = tarea + 1  
+
+while tarea < 30:
+    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
+    tarea = tarea + 1 
+      
+while tarea < 40:
+    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
+    tarea = tarea + 1 
+
+while tarea < 50:
+    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
+    tarea = tarea + 1 
+
+      
+while tarea < 60:
+    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
+    tarea = tarea + 1  
+
+while tarea < 70:
+    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
+    tarea = tarea + 1 
+      
+while tarea < 80:
+    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
+    tarea = tarea + 1  
+
+
+t=time.time()
+r=wrapero.viewGeneralTask()
+t=time.time() - t
+print(t)
 print(r)
+print("------------------------------------")
 #Tenemos que esperar a que cargue todo lo de ejecutar tareas.c -> (sleep?)
+t=time.time()
+r=wrapero.viewSpecificTask()
+t=time.time() - t
+print(t)
+print(r)
 
 time.sleep(10)
 wrapero.mainMenu()
