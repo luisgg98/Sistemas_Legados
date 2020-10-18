@@ -4,7 +4,7 @@ import time
 
 class Wrapper:
     #Atributos de la clase
-    em=Emulator(visible=False)
+    em=Emulator(visible=True)
     __mainframe='155.210.152.51:103'
     timeout=0.25
     __grupo='grupo_04'
@@ -293,43 +293,10 @@ time.sleep(3)
 #wrapero.generalTask("1234", "C")
 #wrapero.generalTask("1234", "D")
 
-#wrapero.viewGeneralTask()
-
 tarea=0
-while tarea < 10:
+while tarea < 129:
     wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
     tarea = tarea + 1 
-
-      
-while tarea < 20:
-    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
-    tarea = tarea + 1  
-
-while tarea < 30:
-    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
-    tarea = tarea + 1 
-      
-while tarea < 40:
-    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
-    tarea = tarea + 1 
-
-while tarea < 50:
-    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
-    tarea = tarea + 1 
-
-      
-while tarea < 60:
-    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
-    tarea = tarea + 1  
-
-while tarea < 70:
-    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
-    tarea = tarea + 1 
-      
-while tarea < 80:
-    wrapero.specificTask("01/02/04","AUTOR","Tarea  "+ str(tarea))
-    tarea = tarea + 1  
-
 
 t=time.time()
 r=wrapero.viewGeneralTask()
@@ -337,12 +304,6 @@ t=time.time() - t
 print(t)
 print(r)
 print("------------------------------------")
-#Tenemos que esperar a que cargue todo lo de ejecutar tareas.c -> (sleep?)
-t=time.time()
-r=wrapero.viewSpecificTask()
-t=time.time() - t
-print(t)
-print(r)
 
 time.sleep(10)
 wrapero.mainMenu()
