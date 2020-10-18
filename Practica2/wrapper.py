@@ -162,18 +162,28 @@ class Wrapper:
                 isTipo=self.em.string_found(i,9,tipo)
                 if isTipo:
                     newTask=self.em.string_get(i,1,80)
-                    print(newTask)
                     if newTask in list:
                         pass
                     else:
                         list.append(newTask)
                     
             i=i+1
-        print('OK ' + str(i))
-        print(list)
         time.sleep(self.timeout)
         return list
 
+
+    #FUNCION que convierte a lista de listas para devolver a frontend en 
+    #   el formato acordado
+    def listOfLists(self,lista):
+        result=list()
+        for tarea in lista:
+            contenido=tarea.split(' ')
+            info=contenido[3:6]
+            nTarea=contenido[1].split(':')
+            nTarea=nTarea[0]
+            newTarea=[nTarea]+info
+            result.append(newTarea)
+        return result
 
 
     #LISTAR TAREAS GENERALES
@@ -206,7 +216,12 @@ class Wrapper:
                 time.sleep(self.timeout)
         print("estoy fuera")
         print(tareas)
+
+        #Convertimos a lista de listas
+        result=self.listOfLists(tareas)
         self.mainMenu()
+
+        return result
 
 
 
@@ -237,19 +252,17 @@ class Wrapper:
                 time.sleep(self.timeout)
         print("estoy fuera")
         print(tareas)
+
+        #Convertimos a lista de listas
+        result=self.listOfLists(tareas)
+
         self.mainMenu()
 
+        return result
+
+
 
     
-    
-
-  
-
-
-
-
-
-
 
 
 #IMPORTANTE: HACER ESTO EN UNA FUNCION, ES UNA API
@@ -263,20 +276,22 @@ wrapero.iniciar()
 #wrapero.assignTask()
 time.sleep(3)
 
-wrapero.generalTask("1234", "prueba")
+#wrapero.generalTask("1234", "A")
+#wrapero.generalTask("1234", "B")
+#wrapero.generalTask("1234", "C")
+#wrapero.generalTask("1234", "D")
 
-wrapero.viewGeneralTask()
-wrapero.viewGeneralTask()
-wrapero.viewSpecificTask()
+#wrapero.viewGeneralTask()
 
-#wrapero.specificTask("2134","A","Aprr")
-#wrapero.specificTask("2134","B","Aprob")
-#wrapero.specificTask("2134","C","Aprob")
-#wrapero.specificTask("2134","D","ok")
-#wrapero.specificTask("2134","E","ok")
-#wrapero.specificTask("2134","F","ok")
-#time.sleep(3)
-#wrapero.viewSpecificTask()
+wrapero.specificTask("2134","A","Aprr")
+wrapero.specificTask("2134","B","Aprob")
+wrapero.specificTask("2134","C","Aprob")
+wrapero.specificTask("2134","D","ok")
+wrapero.specificTask("2134","E","ok")
+wrapero.specificTask("2134","F","ok")
+time.sleep(3)
+r=wrapero.viewSpecificTask()
+print(r)
 #Tenemos que esperar a que cargue todo lo de ejecutar tareas.c -> (sleep?)
 
 time.sleep(10)
