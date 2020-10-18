@@ -92,15 +92,21 @@ class Wrapper:
         self.isMore()
         self.em.send_string('1', ypos=None, xpos=None)
         self.em.send_enter()
-        time.sleep(1)
+        self.em.wait_for_field()
+        time.sleep(self.timeout)
+
         self.isMore()
         self.em.send_string(date, ypos=None, xpos=None)
         self.em.send_enter()
-        time.sleep(1)
+        self.em.wait_for_field()
+        time.sleep(self.timeout)
+
         self.isMore()
         self.em.send_string(description, ypos=None, xpos=None)
         self.em.send_enter()
-        time.sleep(1)
+        self.em.wait_for_field()
+        time.sleep(self.timeout)
+        
         self.mainMenu()
 
 
