@@ -7,6 +7,7 @@ class Wrapper:
     em=Emulator(visible=True)
     __mainframe='155.210.152.51:103'
     timeout=0.25
+    timeout_iniciar=2.25
     __grupo='grupo_04'
     __password='secreto6'
 
@@ -45,7 +46,6 @@ class Wrapper:
     def __isMore(self):
         m = self.em.string_get(43,71,4)
         if m == "More":
-            #print("More")
             self.em.send_enter()
             self.em.wait_for_field()
             time.sleep(self.timeout)
@@ -124,6 +124,49 @@ class Wrapper:
         return result
 
 
+    #PRIVATE:   probar el funcionamiento del wrapper
+    #           NOTA: no esta definido como metodo privado porque tenemos que usarlo
+    #           para testear el wrapper, pero no lo consideramos parte de la API
+    def test(self):
+        self.iniciar()
+
+        tarea=0
+        while tarea < 5:
+            self.generalTask("01/02/04","Tarea  "+ str(tarea))
+            tarea = tarea + 1 
+
+        #Medir tiempos
+        t=time.time()
+        self.generalTask("01/02/04", "GENERAL")
+        t=time.time() - t
+        print("NUEVA GENERAL: " + str(t))
+
+        t=time.time()
+        r=self.viewGeneralTask()
+        t=time.time() - t
+        print("LISTAR GENERALES: " + str(t))
+
+        t=time.time()
+        self.specificTask("01/02/04", "especifica", "soy prueba de especifica")
+        t=time.time() - t
+        print("NUEVA ESPECIFICA: " + str(t))
+
+
+        t=time.time()
+        s=self.viewSpecificTask()
+        t=time.time() - t
+        print("LISTAR ESPECIFICAS: " + str(t))
+
+        print(r)
+        print("------------------------------------")
+        print(s)
+
+        time.sleep(2)
+        self.exitMainFrame()
+
+
+
+
 
 #########################################################################################
 #   PRIVATE METHODS
@@ -151,6 +194,10 @@ class Wrapper:
         self.em.send_enter()
         self.em.wait_for_field()
         time.sleep(self.timeout)
+
+        #Necesario porque la ejecucion de tareas tarda un poco
+        time.sleep(self.timeout_iniciar)
+
 
 
 
@@ -258,15 +305,11 @@ class Wrapper:
             tareas=self.__readTask(tareas,"GENERAL")
             more = self.em.string_get(43,71,4)
             if more != "More":
-                print("out")
                 break
             else:
-                print("in")
                 self.em.send_enter()
                 self.em.wait_for_field()
                 time.sleep(self.timeout)
-        print("estoy fuera")
-        #print(tareas)
         #Convertimos a lista de listas
         result=self.__listOfLists(tareas)
         self.__mainMenu()
@@ -293,14 +336,11 @@ class Wrapper:
             tareas=self.__readTask(tareas,"SPECIFIC")
             more = self.em.string_get(43,71,4)
             if more != "More":
-                print("prueba")
                 break
             else:
-                print("in")
                 self.em.send_enter()
                 self.em.wait_for_field()
                 time.sleep(self.timeout)
-        print("estoy fuera")
         #print(tareas)
         #Convertimos a lista de listas
         result=self.__listOfLists(tareas)
@@ -310,33 +350,9 @@ class Wrapper:
         return result
 
 
+#DESCOMENTAR PARA PROBAR WRAPPER
+#wrapper = Wrapper()
+#wrapper.test()
 
-#CODIGO DE PRUEBA DEL WRAPPER
 
-"""
-#em = Emulator()
-wrapero = Wrapper()
-wrapero.iniciar()
-#wrapero.assignTask()
-time.sleep(3)
 
-#wrapero.generalTask("1234", "A")
-#wrapero.generalTask("1234", "B")
-#wrapero.generalTask("1234", "C")
-#wrapero.generalTask("1234", "D")
-
-tarea=0
-while tarea < 5:
-    wrapero.generalTask("01/02/04","Tarea  "+ str(tarea))
-    tarea = tarea + 1 
-
-t=time.time()
-r=wrapero.viewGeneralTask()
-t=time.time() - t
-print(t)
-print(r)
-print("------------------------------------")
-
-time.sleep(10)
-wrapero.exitMainFrame()
-"""
