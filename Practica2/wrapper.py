@@ -37,7 +37,7 @@ class Wrapper:
     def __nameTruncate(self,name):
         name= name.replace(" ", "_")
         if len(name) > 5:
-            name=name[0:4]  
+            name=name[0:5]  
         return name
 
    
@@ -108,15 +108,39 @@ class Wrapper:
 
 
 
+
+    #PRIVATE:   devuelve la fecha pasada como "ddmm" en el formato "dd/mm"
+    def __dateFormat(self,d):
+        day=int(d)//100
+        if day < 10:
+            day = '0'+str(day)
+        else:
+            day=str(day)
+
+        month=int(d)%100
+        if month < 10:
+            month='0'+str(month)
+        else:
+            month=str(month)
+        
+        date=day + '/' + month
+        return date
+
+
     #PRIVATE:   convierte las tareas a lista de listas para devolver en 
     #           el formato acordado
     def __listOfLists(self, lista):
         result=list()
         for tarea in lista:
             contenido=tarea.split(' ')
+            #Sustituyo en nombre y descripcion por _ por espacio
             contenido[5]=contenido[5].replace("_", " ")
             contenido[4]=contenido[4].replace("_", " ")
+            #Nos quedamos con los campos que nos interesan de la linea
             info=contenido[3:6]
+            print(info[0])
+            info[0]= self.__dateFormat(info[0])
+            print(info[0])
             nTarea=contenido[1].split(':')
             nTarea=nTarea[0]
             newTarea=[nTarea]+info
@@ -147,7 +171,7 @@ class Wrapper:
         print("LISTAR GENERALES: " + str(t))
 
         t=time.time()
-        self.specificTask("01/02/04", "especifica", "soy prueba de especifica")
+        self.specificTask("01/10/04", "especifica", "soy prueba de especifica")
         t=time.time() - t
         print("NUEVA ESPECIFICA: " + str(t))
 
@@ -219,7 +243,7 @@ class Wrapper:
 
 
     #PUBLIC:    INTRODUCIR NUEVA TAREA GENERAL
-    #   IN:     fecha, nombre
+    #   IN:     fecha, descripcion
     #   OUT:    nada
     def generalTask(self,date,description):
         date=self.__fechasTruncate(date)
@@ -289,7 +313,7 @@ class Wrapper:
     #PUBLIC:    LISTAR TAREAS GENERALES
     #   IN:     sin argumentos
     #   OUT:    lista de listas. Cada componente una tarea.
-    #           [[fecha1,nombre1,des1],[fecha2,nombre2,des2]]
+    #           [[nTarea1,fecha1,nombre1,des1],[nTarea2,fecha2,nombre2,des2]]
     #           Nota: nombreX sera la cadena vacia porque las tareas 
     #           generales carecen de descripcion
     def viewGeneralTask(self):
@@ -321,7 +345,7 @@ class Wrapper:
     #PUBLIC:    LISTAR TAREAS ESPECIFICAS
     #   IN:     sin argumentos
     #   OUT:    lista de listas. Cada componente una tarea.
-    #           [[fecha1,nombre1,des1],[fecha2,nombre2,des2]]
+    #           [[nTarea1,fecha1,nombre1,des1],[nTarea2,fecha2,nombre2,des2]]
     def viewSpecificTask(self):
         self.__viewTask()
         self.__isMore()
@@ -351,8 +375,8 @@ class Wrapper:
 
 
 #DESCOMENTAR PARA PROBAR WRAPPER
-#wrapper = Wrapper()
-#wrapper.test()
+wrapper = Wrapper()
+wrapper.test()
 
 
 
