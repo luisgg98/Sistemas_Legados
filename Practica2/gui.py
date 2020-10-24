@@ -1,7 +1,7 @@
 from time import sleep
 
 import PySimpleGUI as sg
-from Practica2 import wrapper
+import wrapper
 
 
 class Gui:
