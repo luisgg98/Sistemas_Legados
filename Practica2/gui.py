@@ -2,12 +2,14 @@ from time import sleep
 
 import PySimpleGUI as sg
 import wrapper
+import re
+import unidecode
 
 
 class Gui:
     """
-    Interfaz de la aplicación legada de tareas en un mainframe. Esta se conecta al mainframe y mediante un wrapper
-    permite mostrar tareas y añadir otras nuevas
+    Interfaz de la aplicación legada de tareas en un mainframe. Esta se conecta al mainframe y
+    mediante un wrapper permite mostrar tareas y añadir otras nuevas
     """
     wr = wrapper.Wrapper()
     NUM_COLS = 3
@@ -17,7 +19,10 @@ class Gui:
     FONT = 'Helvetica 14'
 
     def init(self):
-        """ Pone en funcionamiento la aplicación. Conecta con el mainframe y muestra la nueva interfaz """
+        """ 
+        Pone en funcionamiento la aplicación. Conecta con el mainframe y muestra la nueva 
+        interfaz 
+        """
         # Iniciar wrapper e interfaz
         self.wr.iniciar()
         layout = self.__get_layout()
@@ -41,16 +46,14 @@ class Gui:
                     elif event2 == '-FECHA-':
                         if len(values2['-FECHA-']) > 10:
                             add_task_window['-FECHA-'].update(values2['-FECHA-'][0:10])
-                        if len(values2['-FECHA-']) == 2:
-                            add_task_window['-FECHA-'].update(values2['-FECHA-'] + '/')
-                        if len(values2['-FECHA-']) == 5:
-                            add_task_window['-FECHA-'].update(values2['-FECHA-'] + '/')
                     elif event2 == 'Añadir':
                         fecha, nombre, descripcion = values2['-FECHA-'], values2['-NOMBRE-'], values2['-DESCRIPCION-']
                         # Comprobar campos vacios y correctos
-                        if len(descripcion) == 0 or len(fecha) < 10:
+                        if len(descripcion) == 0 or len(fecha) < 10 or not self.fecha_correcta(fecha):
                             sg.popup("Introduce correctamente la fecha dd/mm/yyyy y descripcion")
                             continue
+                        nombre = unidecode.unidecode(nombre)
+                        descripcion = unidecode.unidecode(descripcion)
                         # Escribir en mainframe
                         self.__write_task(fecha, nombre, descripcion)
                         # Mostrar cambios
@@ -132,6 +135,13 @@ class Gui:
         # Obtener tareas
         data = self.__get_tasks()
         window['-TABLE-'].update(data)
+
+    def fecha_correcta(self, fecha):
+        match = re.match('^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$', fecha)
+        if match is None:
+            return False
+        else:
+            return True
 
 
 gui = Gui()
