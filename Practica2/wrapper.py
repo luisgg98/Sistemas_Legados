@@ -16,6 +16,13 @@ class Wrapper:
     #   PRIVATE METHODS
     #########################################################################################
 
+    # PRIVATE:   login es <=8
+    #           si supera la longitud, la trunca
+    def __loginTruncate(self,login):
+        if len(login) > 8:
+            login = login[0:7]
+        return login
+
     # PRIVATE:   obtener la fecha en formato ddmm
     def __fechasTruncate(self, date):
         lista_date = date.split('/')
@@ -139,6 +146,17 @@ class Wrapper:
     #           para testear el wrapper, pero no lo consideramos parte de la API
     def test(self):
         self.iniciar()
+        buleano = self.login("grupo_04","secreto7")
+        print(buleano)
+        buleano = self.login("grupo_04","sesecto7")
+        print(buleano)
+        buleano = self.login("grupo_04","LETS GO G2")
+        print(buleano)
+        buleano = self.login("LECTRONICS","AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print(buleano)
+        buleano = self.login("grupo_04","secreto6")
+        print(buleano)
+        
 
         tarea = 0
         while tarea < 5:
@@ -177,7 +195,7 @@ class Wrapper:
     #   PRIVATE METHODS
     #########################################################################################
 
-    # PUBLIC:    iniciar la conexion, iniciar sesion y ejecutar tareas.c
+    # PUBLIC:    iniciar la conexion con la maquina Mainframe
     def iniciar(self):
         self.em.connect(self.__mainframe)
         self.em.wait_for_field()
@@ -185,23 +203,50 @@ class Wrapper:
         self.em.wait_for_field()
         time.sleep(self.timeout)
 
-        self.em.fill_field(3, 18, self.__grupo, 8)
-        self.em.fill_field(5, 18, self.__password, 8)
+
+
+    #PUBLIC:
+    # Intenta iniciar sesion
+    # IN: grupo, password
+    # OUT: booleano
+    #        False, si no hay logrado iniciarse la sesion
+    #        True , si ha iniciado sesion
+    def login(self,grupo,password):
+
+        grupo = self.__loginTruncate(grupo)
+        password = self.__loginTruncate(password)
+        logged = False
+
+        self.em.fill_field(3, 18, grupo, 8)
+        self.em.fill_field(5, 18, password, 8)
         self.em.send_enter()
         self.em.wait_for_field()
         time.sleep(self.timeout)
+        for x in range(4, 8):
+            contenido = self.em.string_get(x, 1, 26)
+            if contenido == "Press ENTER to continue...":
+                logged = True
 
         self.em.send_enter()
         self.em.wait_for_field()
         time.sleep(self.timeout)
 
-        self.em.fill_field(3, 15, 'tareas.c', 8)
-        self.em.send_enter()
-        self.em.wait_for_field()
-        time.sleep(self.timeout)
+        if logged:
+            self.em.fill_field(3, 15, 'tareas.c', 8)
+            self.em.send_enter()
+            self.em.wait_for_field()
+            time.sleep(self.timeout)
 
-        # Necesario porque la ejecucion de tareas tarda un poco
-        time.sleep(self.timeout_iniciar)
+            # Necesario porque la ejecucion de tareas tarda un poco
+            time.sleep(self.timeout_iniciar)
+        else:
+
+            self.em.send_enter()
+            self.em.wait_for_field()
+            time.sleep(self.timeout)
+    
+        return logged
+
 
     # PUBLIC:    termina la ejecucion de tareas.c y vuelve al menu principal del
     #           mainframe. 
@@ -343,5 +388,5 @@ class Wrapper:
         return result
 
 # DESCOMENTAR PARA PROBAR WRAPPER
-# wrapper = Wrapper()
-# wrapper.test()
+#wrapper = Wrapper()
+#wrapper.test()
