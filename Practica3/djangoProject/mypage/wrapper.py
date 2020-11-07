@@ -71,9 +71,11 @@ class WindowMgr():
     def start_project(self):
         """Funcion para centrarse en la aplicacion legada """
         self.find_window_wildcard('.*DOSBox.*')
+        pyautogui.press('alt')
         win32gui.SetForegroundWindow(self._handle)
-        # Es necesario para forzarlo a centrarse en la aplicacion
         pyautogui.press('enter')
+        # Es necesario para forzarlo a centrarse en la aplicacion
+
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
     def _window_enum_callback(self, hwnd, wildcard):
@@ -365,13 +367,14 @@ class WindowMgr():
 
 
 # Conseguir la pantalla de la aplicacion legada
-w = WindowMgr()
-w.start_project()
+#singleton = WindowMgr()
+#w = WindowMgr()
+#w.start_project()
 #time.sleep(5)
 
-lista = w.listado_programas()
-for i in lista:
-    print(i)
+#lista = w.listado_programas()
+#for i in lista:
+#    print(i)
 
 # print(w.screenshot())
 

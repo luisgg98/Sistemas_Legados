@@ -1,6 +1,9 @@
 from django.urls import path
-from . import views, prueba
+from . import views
 from django.http import HttpResponse
+#get_them_all
 urlpatterns = [
-    path('find_by_name/', prueba.find_by_name),
+    path('find_by_name/', views.find_by_name),
+    path('accept_result/', views.accept_result),
+    path('get_them_all/', views.get_them_all),
 ]
