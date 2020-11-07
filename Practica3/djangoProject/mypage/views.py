@@ -70,7 +70,7 @@ def choose_another(request):
         singleton = WindowMgr()
         singleton.start_project()
         resultado = singleton.elegir_otro_resultado()
-        if resultado == []:
+        if resultado != []:
             return_program(resultado)
         else:
             no_result_found()
@@ -86,4 +86,32 @@ def get_them_all(request):
 
     }
     return JsonResponse(data)
+
+def get_tape_all(request):
+    if request.method == 'GET':
+        if request.GET.get('program') != '' and request.GET.get('program') != None:
+            singleton = WindowMgr()
+            singleton.start_project()
+            cinta = request.GET.get('cinta')
+            resultado = singleton.lista_programas_una_cinta(cinta)
+            if resultado != []:
+                data = {
+                    'data': cinta,  # username of current logged-in user, otherwise Anonymous
+
+                }
+
+                return JsonResponse(data)
+
+            else:
+                no_result_found()
+
+
+
+        else:
+            complain_about_program()
+
+
+    else:
+        complain_about_get()
+
 # Create your views here.

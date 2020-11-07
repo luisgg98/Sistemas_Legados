@@ -7,7 +7,6 @@ from PIL import Image
 import win32gui
 import re
 import time
-import os
 
 
 
@@ -73,9 +72,8 @@ class WindowMgr():
         self.find_window_wildcard('.*DOSBox.*')
         pyautogui.press('alt')
         win32gui.SetForegroundWindow(self._handle)
-        pyautogui.press('enter')
         # Es necesario para forzarlo a centrarse en la aplicacion
-
+        pyautogui.press('enter')
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
     def _window_enum_callback(self, hwnd, wildcard):
@@ -177,7 +175,7 @@ class WindowMgr():
         """Verifica si hay alguna opcion mas disponible"""
         hay_resultado = False
         i = 0
-        substring = "ES ESTE 7 "
+        substring = "ES ESTE "
         while i < len(data) and not hay_resultado:
             if substring in data[i]:
                 hay_resultado = True
@@ -261,6 +259,13 @@ class WindowMgr():
                 isCabecera = (aux[1] == 'NOMBRE' and aux[2] == 'TIPO')
                 if not isCabecera:
                     # Si es linea valida, la conservo
+                    aux2 = aux[1]
+                    # Arreglamos si alguna componente no tiene 4 elementos (por mala separacion por tabuladores
+                    if len(aux2) > 30:
+                        aux[1] = aux2[0:30]
+                        aux3 = aux[2]
+                        aux[2] = aux2[31:]
+                        aux = aux + [aux3]
                     lAux = lAux + [aux]
         return lAux
 
@@ -277,7 +282,7 @@ class WindowMgr():
         return lAux
 
     def __listado_registros(self):
-        time.sleep(0.3)
+        time.sleep(0.25)
         lista = []
         pantalla = self.screenshot_only()
 
@@ -292,8 +297,40 @@ class WindowMgr():
         lista = self.__delete_last_first(lista)
         return lista
 
-        ###########################################
+    def __ordenar_por_grabacion(self):
+        pyautogui.press('3')
+        pyautogui.press('enter')
+        pyautogui.press('4')
+        pyautogui.press('enter')
+        pantalla = self.screenshot_only()
+        isMenu = self.__is_menu()
+        while not isMenu:
+            pantalla = self.screenshot_only()
+            isMenu = self.__is_menu()
 
+
+    def __listar_todos_programas_cinta(self, cinta, lista):
+        lAux=[]
+        for i in lista:
+            #Miramos si coincide la cinta con la buscada
+            if i[3] == cinta:
+                lAux=lAux+[i]
+            else:
+                #Buscamos tambien entre los programas en multiples cintas
+                tape = i[3].split("-")
+                found = True
+                j = 0
+                while found and j < len(tape):
+                    if tape[j] == cinta:
+                        # Coincide y debemos añadirlo a la lista
+                        found=False
+                        lAux=lAux+[i]
+                    else:
+                        j = j + 1
+        return lAux
+
+
+    ###########################################
     ##      FUNCIONES PUBLICAS              ##
     ###########################################
 
@@ -358,21 +395,32 @@ class WindowMgr():
         DEVUELVE LISTA DE LISTAS:
         [[numero, nombre, tipo, cinta]] """
 
-    def listado_programas(self):
+    def lista_todos_los_programas(self):
+        #NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
+        self.__ordenar_por_grabacion()
+        #VAMOS AL LISTADO
         pyautogui.press('6')
         pyautogui.press('enter')
         lista = self.__listado_registros()
         return lista
 
 
+    def lista_programas_una_cinta(self,cinta):
+        #obtenemos el listado de todos los programas
+        lista=self.lista_todos_los_programas()
+        #filtramos por cinta
+        lista=self.__listar_todos_programas_cinta(cinta,lista)
+        return lista
+
+
+
 
 # Conseguir la pantalla de la aplicacion legada
-#singleton = WindowMgr()
 #w = WindowMgr()
 #w.start_project()
 #time.sleep(5)
 
-#lista = w.listado_programas()
+#lista = w.lista_programas_una_cinta("E")
 #for i in lista:
 #    print(i)
 
