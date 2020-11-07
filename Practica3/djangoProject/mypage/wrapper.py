@@ -7,9 +7,12 @@ from PIL import Image
 import win32gui
 import re
 import time
+import os
 
 
-class WindowMgr:
+
+
+class WindowMgr():
     """Permite encontrar una ventana y almacenarla para hacer screenshot"""
 
     ###########################################
@@ -360,10 +363,11 @@ class WindowMgr:
         return lista
 
 
+
 # Conseguir la pantalla de la aplicacion legada
 w = WindowMgr()
 w.start_project()
-time.sleep(5)
+#time.sleep(5)
 
 lista = w.listado_programas()
 for i in lista:
