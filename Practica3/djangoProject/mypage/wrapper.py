@@ -397,7 +397,7 @@ class WindowMgr():
 
     def lista_todos_los_programas(self):
         #NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
-        self.__ordenar_por_grabacion()
+        #self.__ordenar_por_grabacion()
         #VAMOS AL LISTADO
         pyautogui.press('6')
         pyautogui.press('enter')

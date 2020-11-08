@@ -29,12 +29,31 @@ def return_program(resultado):
     }
     return JsonResponse(data)
 
+
+def descompose_program(resultado):
+    data = {
+        'registro': resultado[0],
+        'nombre': resultado[1],
+        'tipo': resultado[2],
+        'cinta': resultado[3]
+
+    }
+    return data
+
+
+def clean_result(lista):
+    jsonlist = []
+    for i in lista:
+        jsonlist.append(descompose_program(i))
+
+    return jsonlist
+
 def find_by_name(request):
     if request.method == 'GET' :
         if request.GET.get('program') !='' and request.GET.get('program') != None:
             singleton = WindowMgr()
             singleton.start_project()
-            programa = request.GET.get('name')
+            programa = request.GET.get('program')
             booleano = singleton.find_result(programa)
             if booleano == True:
                 resultado = singleton.obtener_resultado()
@@ -58,7 +77,7 @@ def accept_result(request):
         singleton.start_project()
         singleton.confirmar_resultado()
         data = {
-            'message': "Se ha confirmado el resultado",  # username of current logged-in user, otherwise Anonymous
+            'message': "Se ha confirmado el resultado",
 
         }
         return JsonResponse(data)
@@ -80,23 +99,22 @@ def choose_another(request):
 def get_them_all(request):
     singleton = WindowMgr()
     singleton.start_project()
-    programa =singleton.listado_programas()
+    programa =singleton.lista_todos_los_programas()
     data = {
-        'data': programa,  # username of current logged-in user, otherwise Anonymous
-
+        'data':clean_result(programa),
     }
     return JsonResponse(data)
 
 def get_tape_all(request):
     if request.method == 'GET':
-        if request.GET.get('program') != '' and request.GET.get('program') != None:
+        if request.GET.get('cinta') != '' and request.GET.get('cinta') != None:
             singleton = WindowMgr()
             singleton.start_project()
             cinta = request.GET.get('cinta')
             resultado = singleton.lista_programas_una_cinta(cinta)
             if resultado != []:
                 data = {
-                    'data': cinta,  # username of current logged-in user, otherwise Anonymous
+                    'data': clean_result(resultado),
 
                 }
 
@@ -113,5 +131,8 @@ def get_tape_all(request):
 
     else:
         complain_about_get()
+
+
+
 
 # Create your views here.
