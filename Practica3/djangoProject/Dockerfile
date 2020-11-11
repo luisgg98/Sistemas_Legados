@@ -17,6 +17,7 @@ COPY ./requirements.txt /backend/
 
 # Upgrade pip
 RUN pip install --upgrade pip
+RUN sh ./pcbasic/install.sh
 
 # Install the requirements.
 RUN pip install -r requirements.txt
