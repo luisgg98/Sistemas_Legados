@@ -3,11 +3,16 @@ import re
 import time
 import os
 
-
-
-
 class WindowMgr():
-    """Permite encontrar una ventana y almacenarla para hacer screenshot"""
+
+    ###########################################
+    ##      VARIABLES PRIVADAS               ##
+    ###########################################
+    __ending_operaion= "8S" + "\r\n"
+    __windows_new_line =  "\r\n"
+
+
+
 
     ###########################################
     ##      FUNCIONES PRIVADAS               ##
@@ -274,9 +279,8 @@ class WindowMgr():
         """Dato del nombre de un programa busca si hay alguno con ese nombre """
         resultado = []
         programa=programa.upper()
-        print(programa)
-        print(os.getcwd())
-        script = "7N" + "\r\n" + programa + "\r\n" + "\r\n" + "\r\n" + "\r\n" + "\r\n" + "8S" + "\r\n"
+        script = "7N" + self.__windows_new_line + programa + self.__windows_new_line + self.__windows_new_line +\
+                 self.__windows_new_line + self.__windows_new_line + self.__windows_new_line + self.__ending_operaion
         f = open("get_program_by_name", "w")
         f.write(script)
         f.close()
@@ -284,16 +288,13 @@ class WindowMgr():
         f = open("program_by_name.txt","r")
         lines = f.readlines()
         f.close()
-
         if len(lines) > 12 :
-            print("hola")
             if "NO HAY NINGUN PROGRAMA CON ESE NOMBRE; PULSA ENTER" in (lines[12]):
                 pass
             else:
                 resultado = self.__filter_result(lines[12])
-                
-        #os.remove("program_by_name.txt")
-        #os.remove("get_program_by_name")
+        os.remove("program_by_name.txt")
+        os.remove("get_program_by_name")
         return  resultado
 
     """ LISTADO DE TODOS LOS REGISTROS DEL SISTEMA
