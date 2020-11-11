@@ -1,5 +1,5 @@
-from django.http import JsonResponse
-from mypage.wrapper import *
+from django.http import JsonResponse, HttpResponse
+from wrapper import *
 
 def complain_about_get():
     data = {
@@ -18,6 +18,7 @@ def no_result_found():
         'message': "No se han encontrado resultados",  # username of current logged-in user, otherwise Anonymous
     }
     return JsonResponse(data)
+
 
 def return_program(resultado):
     data = {
@@ -52,24 +53,16 @@ def find_by_name(request):
     if request.method == 'GET' :
         if request.GET.get('program') !='' and request.GET.get('program') != None:
             singleton = WindowMgr()
-            singleton.start_project()
             programa = request.GET.get('program')
-            booleano = singleton.find_result(programa)
-            if booleano == True:
-                resultado = singleton.obtener_resultado()
-                if resultado == []:
-                    return_program(resultado)
-                else:
-                    no_result_found()
-
-                return_program(resultado)
+            resultado = singleton.find_program_by_name(programa)
+            if resultado != []:
+                return return_program(resultado)
             else:
-                no_result_found()
-
+                return no_result_found()
         else:
-            complain_about_program()
+            return complain_about_program()
     else:
-        complain_about_get()
+        return complain_about_get()
 
 def accept_result(request):
     if request.method == 'GET' :
@@ -82,7 +75,7 @@ def accept_result(request):
         }
         return JsonResponse(data)
     else:
-        complain_about_get()
+        return complain_about_get()
 
 def choose_another(request):
     if request.method == 'GET':
@@ -90,15 +83,14 @@ def choose_another(request):
         singleton.start_project()
         resultado = singleton.elegir_otro_resultado()
         if resultado != []:
-            return_program(resultado)
+            return return_program(resultado)
         else:
-            no_result_found()
+            return no_result_found()
     else:
-        complain_about_get()
+        return complain_about_get()
 
 def get_them_all(request):
     singleton = WindowMgr()
-    singleton.start_project()
     programa =singleton.lista_todos_los_programas()
     data = {
         'data':clean_result(programa),
@@ -109,7 +101,6 @@ def get_tape_all(request):
     if request.method == 'GET':
         if request.GET.get('cinta') != '' and request.GET.get('cinta') != None:
             singleton = WindowMgr()
-            singleton.start_project()
             cinta = request.GET.get('cinta')
             resultado = singleton.lista_programas_una_cinta(cinta)
             if resultado != []:
@@ -121,16 +112,13 @@ def get_tape_all(request):
                 return JsonResponse(data)
 
             else:
-                no_result_found()
-
-
+                return no_result_found()
 
         else:
-            complain_about_program()
-
+            return complain_about_program()
 
     else:
-        complain_about_get()
+        return complain_about_get()
 
 
 

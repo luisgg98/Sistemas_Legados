@@ -1,12 +1,7 @@
-import argparse
-
-import cv2
 import pyautogui
-import pytesseract
-from PIL import Image
-import win32gui
 import re
 import time
+import os
 
 
 
@@ -20,10 +15,7 @@ class WindowMgr():
 
     """FUNCIONES PRIVADAS"""
 
-    def __init__(self):
-        """Constructor"""
-        self._handle = None
-
+    """Esta siendo usada en la nueva parte"""
     def __check_type_program(self, programa):
         """Verifica cual es el tipo del programa"""
         tipo_encontrado = "Indeterminado"
@@ -67,42 +59,7 @@ class WindowMgr():
 
         return [tipo_encontrado, programa]
 
-    def start_project(self):
-        """Funcion para centrarse en la aplicacion legada """
-        self.find_window_wildcard('.*DOSBox.*')
-        pyautogui.press('alt')
-        win32gui.SetForegroundWindow(self._handle)
-        # Es necesario para forzarlo a centrarse en la aplicacion
-        pyautogui.press('enter')
-        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
-    def _window_enum_callback(self, hwnd, wildcard):
-        """Pasar a win32gui.EnumWindows() para comprobar todas las ventanas abiertas"""
-        if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) is not None:
-            self._handle = hwnd
-
-    def find_window_wildcard(self, wildcard):
-        """Encuentra una ventana segun su nombre mediante una expresion"""
-        self._handle = None
-        win32gui.EnumWindows(self._window_enum_callback, wildcard)
-
-    def screenshot(self):
-        """Toma una captura de la ventana guardada actual. No debe estar minimizada"""
-        # win32gui.SetForegroundWindow(self._handle)
-        x, y, x1, y1 = win32gui.GetClientRect(self._handle)
-        x, y = win32gui.ClientToScreen(self._handle, (x, y))
-        x1, y1 = win32gui.ClientToScreen(self._handle, (x1 - x, y1 - y))
-        pyautogui.screenshot('images/captura.png', region=(x, y, x1, y1))
-        mucho_texto = (pytesseract.image_to_string(Image.open('images/captura.png'), lang='spa'))
-        return (mucho_texto.split('\n'))
-
-    def screenshot_only(self):
-        """Toma una captura de la ventana guardada actual. No debe estar minimizada"""
-        # win32gui.SetForegroundWindow(self._handle)
-        x, y, x1, y1 = win32gui.GetClientRect(self._handle)
-        x, y = win32gui.ClientToScreen(self._handle, (x, y))
-        x1, y1 = win32gui.ClientToScreen(self._handle, (x1 - x, y1 - y))
-        pyautogui.screenshot('images/captura.png', region=(x, y, x1, y1))
 
     def __clean_list(self, datas):
         """Elimina los elementos innecesarios de la lista"""
@@ -119,41 +76,37 @@ class WindowMgr():
         return new_list
 
     # Funcion utilizada para buscar un programa por su nombre
+    """Utilizada en la nueva parte"""
     def __filter_result(self, data):
         """ Data una lista de elementos se queda con el que empieza por un digito"""
-        i = 0
         new_list_list = []
-        while i < len(data):
-            # Esto es debido a que los elementos de los programas cuando los buscas por
-            # nombre te los muestra 1 por 1 y todos empiezan por su numero de registro
-            if data[i][0].isdigit():
-                # Eliminamos la K QUE SEPARA EL NUMERO DE REGISTRO CON EL RESTO
-                numeros = re.findall("\A[0-9]* K", data[i])
-                numero = numeros[0]
-                # AL RESTO LE QUITAMOS CINTA Y OBTENEMOS SU TIPO DE CINTA
-                cintas = re.findall("CINTA*.*", data[i])
-                cinta = cintas[-1]
-                # OBTENEMOS EL TIPO DEL PROGRAMA DEL RESTO
-                tipos = self.__check_type_program(data[i])
-                tipo = tipos[0]
-                # LE QUITAMOS EL RESTO QUE NO NOS SIRVE
-                nombre = tipos[1].replace(cinta, "")
-                nombre = nombre.replace(numero, "")
 
-                nombre = re.sub("\A\s", "", nombre)
-                nombre = re.sub("\s\Z", "", nombre)
+        # Esto es debido a que los elementos de los programas cuando los buscas por
+        # ombre te los muestra 1 por 1 y todos empiezan por su numero de registro
+        # Eliminamos la K QUE SEPARA EL NUMERO DE REGISTRO CON EL RESTO
+        numeros = re.findall("\A\s[0-9]* ", data)
+        numero = numeros[0]
+        # AL RESTO LE QUITAMOS CINTA Y OBTENEMOS SU TIPO DE CINTA
+        cintas = re.findall("CINTA*.*", data)
+        cinta = cintas[-1]
+        # OBTENEMOS EL TIPO DEL PROGRAMA DEL RESTO
+        tipos = self.__check_type_program(data)
+        tipo = tipos[0]
+        # LE QUITAMOS EL RESTO QUE NO NOS SIRVE
+        nombre = tipos[1].replace(cinta, "")
+        nombre = nombre.replace(numero, "")
+        nombre = nombre.replace("- ", "")
+        nombre = re.sub("\A\s", "", nombre)
+        nombre = re.sub("\s\Z", "", nombre)
+        numero = numero.replace(" ", "")
 
-                numero = numero.replace("K", "")
-                numero = numero.replace(" ", "")
+        new_list_list.append(numero)
+        new_list_list.append(nombre)
+        new_list_list.append(tipo)
 
-                new_list_list.append(numero)
-                new_list_list.append(nombre)
-                new_list_list.append(tipo)
-
-                cinta = cinta.replace("CINTA", "")
-                cinta = cinta.replace(" ", "")
-                new_list_list.append(cinta)
-            i = i + 1
+        cinta = cinta.replace("CINTA:", "")
+        cinta = cinta.replace(" ", "")
+        new_list_list.append(cinta)
         return new_list_list
 
     def __hay_resultado(self, data):
@@ -181,25 +134,6 @@ class WindowMgr():
                 hay_resultado = True
             i = i + 1
         return hay_resultado
-
-    def __preprocess_image(self):
-        image = cv2.imread('images/captura.png')
-
-        # Incrementamos el tamaño de la imagen para mejor procesado de pytesseract
-        image = cv2.resize(image, (0, 0), fx=7, fy=7)
-
-        # Cambiamos el espaio de colores a escala de grises. Necesario para threshold
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        # Invierte los colores a fondo blanco y letras negras. THRESH_OTSU deja las letras más legibles
-        thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-        cv2.imwrite("images/inverted.png", thresh)
-
-        # Configuramos a pytesseract para que diferencie espacios de tabuladores y transformamos a string
-        con = '-c preserve_interword_spaces=1 --psm 6'
-        data = pytesseract.image_to_string('images/inverted.png', lang="eng", config=con)
-
-        return data
 
     def __some_string_fixes(self, lista):
         # Limpia algunos caracteres mal leidos
@@ -334,62 +268,33 @@ class WindowMgr():
     ##      FUNCIONES PUBLICAS              ##
     ###########################################
 
-    """ BUSCAR DATOS SIN CONOCER EL NUMERO DE REGISTRO """
+    """ BUSCAR DADO EL NOMBRE EL NUMERO DE REGISTRO """
 
-    def find_result(self, programa):
+    def find_program_by_name(self, programa):
         """Dato del nombre de un programa busca si hay alguno con ese nombre """
-        pyautogui.press('7')
-        programa = programa.upper()
-        pyautogui.press('N')
-        pyautogui.press('enter')
-        pyautogui.write(programa)
-        pyautogui.press('enter')
-        time.sleep(1.5)
-        pantalla = self.screenshot()
-        booleano = self.__hay_resultado(pantalla)
-
-        if booleano == False:
-            pyautogui.press('enter')
-            pyautogui.press('N')
-            pyautogui.press('enter')
-            # Devuelve True o False si ha encontrado un programa o no con ese nombre
-        return booleano
-
-    def obtener_resultado(self):
-        """ Si anteriormente ha encontrado un programa con ese nombre
-            obtiene este programa y lo devuelve en formato de lista """
-        pantalla = self.screenshot()
-        pantalla = self.__clean_list(pantalla)
-        resultado = self.__filter_result(pantalla)
-        return resultado
-
-    def confirmar_resultado(self):
-        """ Confirma que ese el programa que queremos"""
-        pyautogui.press('S')
-        pyautogui.press('enter')
-        pyautogui.press('N')
-        pyautogui.press('enter')
-        pyautogui.press('N')
-        pyautogui.press('enter')
-        # Al terminar nos devuelve al Menu principal
-
-    def elegir_otro_resultado(self):
-        """ Busca si existe otro resultado y si es asi lo devuelve"""
-        pantalla = self.screenshot()
         resultado = []
-        booleano = self.__quedan_resultados(pantalla)
-        if booleano:
-            pyautogui.press('N')
-            pyautogui.press('enter')
-            time.sleep(0.5)
-            booleano = self.__hay_resultado(pantalla)
-            if booleano:
-                resultado = self.obtener_resultado()
+        programa=programa.upper()
+        print(programa)
+        print(os.getcwd())
+        script = "7N" + "\r\n" + programa + "\r\n" + "\r\n" + "\r\n" + "\r\n" + "\r\n" + "8S" + "\r\n"
+        f = open("get_program_by_name", "w")
+        f.write(script)
+        f.close()
+        os.system("pcbasic   database -q --output=program_by_name.txt --input=get_program_by_name 2> /dev/null")
+        f = open("program_by_name.txt","r")
+        lines = f.readlines()
+        f.close()
+
+        if len(lines) > 12 :
+            print("hola")
+            if "NO HAY NINGUN PROGRAMA CON ESE NOMBRE; PULSA ENTER" in (lines[12]):
+                pass
             else:
-                pyautogui.press('enter')
-                pyautogui.press('N')
-                pyautogui.press('enter')
-        return resultado
+                resultado = self.__filter_result(lines[12])
+                
+        #os.remove("program_by_name.txt")
+        #os.remove("get_program_by_name")
+        return  resultado
 
     """ LISTADO DE TODOS LOS REGISTROS DEL SISTEMA
         DEVUELVE LISTA DE LISTAS:
@@ -415,62 +320,8 @@ class WindowMgr():
 
 
 
-# Conseguir la pantalla de la aplicacion legada
-#w = WindowMgr()
-#w.start_project()
-#time.sleep(5)
-
-#lista = w.lista_programas_una_cinta("E")
-#for i in lista:
-#    print(i)
-
-# print(w.screenshot())
-
-# Hacer captura de la ventana de la aplicacion legada
-# w.screenshot()
-
-# Setup de tesseract
 
 
-# Obtener texto de la captura
-# print(pytesseract.image_to_string(Image.open('images/captura.png'), lang='spa'))
 
-# mucho_texto=(pytesseract.image_to_string(Image.open('images/captura.png'), lang='spa'))
-# print(len(mucho_texto))
-# mucho_texto=mucho_texto.replace("\n","_")
-# print(mucho_texto)
-# w.find_result("CA")
-# print(w.obtener_resultado())
-# print(w.elegir_otro_resultado())
-# print(w.elegir_otro_resultado())
-# w.confirmar_resultado()
 
-# print(w.find_result("BAD BUNNY"))
-#
-# w.obtener_resultado()
-'''
-w.find_result("CAR")
-print(w.obtener_resultado())
-print(w.elegir_otro_resultado())
-print(w.elegir_otro_resultado())
-w.confirmar_resultado()
 
-w.find_result("TAR")
-print(w.obtener_resultado())
-print(w.elegir_otro_resultado())
-print(w.elegir_otro_resultado())
-w.confirmar_resultado()
-
-w.find_result("DAR")
-print(w.obtener_resultado())
-print(w.elegir_otro_resultado())
-print(w.elegir_otro_resultado())
-w.confirmar_resultado()
-
-w.find_result("BU")
-print(w.obtener_resultado())
-print(w.elegir_otro_resultado())
-w.confirmar_resultado()
-
-w.find_result("ZZZ")
-'''
