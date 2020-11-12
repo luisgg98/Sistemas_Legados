@@ -11,20 +11,22 @@ RUN mkdir /backend
 # Change the working directory.
 # Every command after this will be run from the /code directory.
 WORKDIR /backend
-RUN pwd
 
 # Copy the requirements.txt file.
 COPY ./requirements.txt /backend/
+
 # Copy the rest of the code.
 COPY . /backend/
 
 # Upgrade pip
 RUN pip install --upgrade pip
+
+#Instal PCBASIC
+RUN pip install pcbasic
 #RUN sh pcbasic/pcbasic-v1.2.14/install.sh
 
 # Install the requirements.
 RUN pip install -r requirements.txt
 
-#Lanzar el servidor
 
 

@@ -3,16 +3,13 @@ import re
 import time
 import os
 
-class WindowMgr():
 
+class WindowMgr():
     ###########################################
     ##      VARIABLES PRIVADAS               ##
     ###########################################
-    __ending_operaion= "8S" + "\r\n"
-    __windows_new_line =  "\r\n"
-
-
-
+    __ending_operaion = "8S" + "\r\n"
+    __windows_new_line = "\r\n"
 
     ###########################################
     ##      FUNCIONES PRIVADAS               ##
@@ -21,6 +18,7 @@ class WindowMgr():
     """FUNCIONES PRIVADAS"""
 
     """Esta siendo usada en la nueva parte"""
+
     def __check_type_program(self, programa):
         """Verifica cual es el tipo del programa"""
         tipo_encontrado = "Indeterminado"
@@ -64,8 +62,6 @@ class WindowMgr():
 
         return [tipo_encontrado, programa]
 
-
-
     def __clean_list(self, datas):
         """Elimina los elementos innecesarios de la lista"""
         i = 0
@@ -82,6 +78,7 @@ class WindowMgr():
 
     # Funcion utilizada para buscar un programa por su nombre
     """Utilizada en la nueva parte"""
+
     def __filter_result(self, data):
         """ Data una lista de elementos se queda con el que empieza por un digito"""
         new_list_list = []
@@ -113,32 +110,6 @@ class WindowMgr():
         cinta = cinta.replace(" ", "")
         new_list_list.append(cinta)
         return new_list_list
-
-    def __hay_resultado(self, data):
-        """Devuelve true en caso de que haya un programa con el nombre buscado"""
-        hay_resultado = True
-        i = 0
-        substring = "NO HAY NINGUN POGRAMA CON ESE NOMBRE"
-        # A veces no lee correctamente la pantalla, mi posiblemente haya que
-        # cambiar el valor de estos strings
-        subsubstring = "RR HAR RIRGUR PRRGRARA CRR ESE RRMRREE PULSA ERTER"
-
-        while i < len(data) and hay_resultado:
-            if substring in data[i] or subsubstring in data[i]:
-                hay_resultado = False
-            i = i + 1
-        return hay_resultado
-
-    def __quedan_resultados(self, data):
-        """Verifica si hay alguna opcion mas disponible"""
-        hay_resultado = False
-        i = 0
-        substring = "ES ESTE "
-        while i < len(data) and not hay_resultado:
-            if substring in data[i]:
-                hay_resultado = True
-            i = i + 1
-        return hay_resultado
 
     def __some_string_fixes(self, lista):
         # Limpia algunos caracteres mal leidos
@@ -247,27 +218,25 @@ class WindowMgr():
             pantalla = self.screenshot_only()
             isMenu = self.__is_menu()
 
-
     def __listar_todos_programas_cinta(self, cinta, lista):
-        lAux=[]
+        lAux = []
         for i in lista:
-            #Miramos si coincide la cinta con la buscada
+            # Miramos si coincide la cinta con la buscada
             if i[3] == cinta:
-                lAux=lAux+[i]
+                lAux = lAux + [i]
             else:
-                #Buscamos tambien entre los programas en multiples cintas
+                # Buscamos tambien entre los programas en multiples cintas
                 tape = i[3].split("-")
                 found = True
                 j = 0
                 while found and j < len(tape):
                     if tape[j] == cinta:
                         # Coincide y debemos añadirlo a la lista
-                        found=False
-                        lAux=lAux+[i]
+                        found = False
+                        lAux = lAux + [i]
                     else:
                         j = j + 1
         return lAux
-
 
     ###########################################
     ##      FUNCIONES PUBLICAS              ##
@@ -278,51 +247,41 @@ class WindowMgr():
     def find_program_by_name(self, programa):
         """Dato del nombre de un programa busca si hay alguno con ese nombre """
         resultado = []
-        programa=programa.upper()
-        script = "7N" + self.__windows_new_line + programa + self.__windows_new_line + self.__windows_new_line +\
+        programa = programa.upper()
+        script = "7N" + self.__windows_new_line + programa + self.__windows_new_line + self.__windows_new_line + \
                  self.__windows_new_line + self.__windows_new_line + self.__windows_new_line + self.__ending_operaion
         f = open("get_program_by_name", "w")
         f.write(script)
         f.close()
         os.system("pcbasic   database -q --output=program_by_name.txt --input=get_program_by_name 2> /dev/null")
-        f = open("program_by_name.txt","r")
+        f = open("program_by_name.txt", "r")
         lines = f.readlines()
         f.close()
-        if len(lines) > 12 :
+        if len(lines) > 12:
             if "NO HAY NINGUN PROGRAMA CON ESE NOMBRE; PULSA ENTER" in (lines[12]):
                 pass
             else:
                 resultado = self.__filter_result(lines[12])
         os.remove("program_by_name.txt")
         os.remove("get_program_by_name")
-        return  resultado
+        return resultado
 
     """ LISTADO DE TODOS LOS REGISTROS DEL SISTEMA
         DEVUELVE LISTA DE LISTAS:
         [[numero, nombre, tipo, cinta]] """
 
     def lista_todos_los_programas(self):
-        #NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
-        #self.__ordenar_por_grabacion()
-        #VAMOS AL LISTADO
+        # NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
+        # self.__ordenar_por_grabacion()
+        # VAMOS AL LISTADO
         pyautogui.press('6')
         pyautogui.press('enter')
         lista = self.__listado_registros()
         return lista
 
-
-    def lista_programas_una_cinta(self,cinta):
-        #obtenemos el listado de todos los programas
-        lista=self.lista_todos_los_programas()
-        #filtramos por cinta
-        lista=self.__listar_todos_programas_cinta(cinta,lista)
+    def lista_programas_una_cinta(self, cinta):
+        # obtenemos el listado de todos los programas
+        lista = self.lista_todos_los_programas()
+        # filtramos por cinta
+        lista = self.__listar_todos_programas_cinta(cinta, lista)
         return lista
-
-
-
-
-
-
-
-
-
