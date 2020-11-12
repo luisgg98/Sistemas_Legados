@@ -10,7 +10,6 @@ class WindowMgr():
     ###########################################
     __ending_operaion = "8S" + "\r\n"
     __windows_new_line = "\r\n"
-
     ###########################################
     ##      FUNCIONES PRIVADAS               ##
     ###########################################
@@ -111,6 +110,8 @@ class WindowMgr():
         new_list_list.append(cinta)
         return new_list_list
 
+    """ Funcion no usada """
+
     def __some_string_fixes(self, lista):
         # Limpia algunos caracteres mal leidos
         lista = lista.replace("> ", "S")
@@ -125,12 +126,16 @@ class WindowMgr():
         lista = lista.replace("X<I", "XXI")
         return lista
 
+    """ Funcion no usada """
+
     # Quita lineas vacias
     def __remove_empty_lines(self, lista):
         for i in lista:
             if i == "":
                 lista.remove(i)
         return lista
+
+    """ Funcion no usada """
 
     # Comprueba si está en la pantalla menu
     def __is_menu(self):
@@ -142,6 +147,8 @@ class WindowMgr():
             return True
         else:
             return False
+
+    """ Funcion no usada """
 
     def __listado_texto_captura(self):
         # Hago otro pantallazo
@@ -179,6 +186,8 @@ class WindowMgr():
                     lAux = lAux + [aux]
         return lAux
 
+    """ Funcion no usada """
+
     def __delete_last_first(self, lista):
         lAux = []
         i = 1
@@ -190,6 +199,8 @@ class WindowMgr():
             lAux = lAux + [aux]
             i = i + 1
         return lAux
+
+    """ Funcion no usada """
 
     def __listado_registros(self):
         time.sleep(0.25)
@@ -207,6 +218,8 @@ class WindowMgr():
         lista = self.__delete_last_first(lista)
         return lista
 
+    """ Funcion no usada """
+
     def __ordenar_por_grabacion(self):
         pyautogui.press('3')
         pyautogui.press('enter')
@@ -217,6 +230,8 @@ class WindowMgr():
         while not isMenu:
             pantalla = self.screenshot_only()
             isMenu = self.__is_menu()
+
+    """ Funcion no usada """
 
     def __listar_todos_programas_cinta(self, cinta, lista):
         lAux = []
@@ -270,6 +285,8 @@ class WindowMgr():
         DEVUELVE LISTA DE LISTAS:
         [[numero, nombre, tipo, cinta]] """
 
+    """ Completar funcionalidad """
+
     def lista_todos_los_programas(self):
         # NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
         # self.__ordenar_por_grabacion()
@@ -278,6 +295,8 @@ class WindowMgr():
         pyautogui.press('enter')
         lista = self.__listado_registros()
         return lista
+
+    """ Completar funcionalidad """
 
     def lista_programas_una_cinta(self, cinta):
         # obtenemos el listado de todos los programas

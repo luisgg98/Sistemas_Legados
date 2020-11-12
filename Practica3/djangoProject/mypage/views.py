@@ -1,6 +1,10 @@
 from django.http import JsonResponse, HttpResponse
 from wrapper import *
 
+#####################################
+#### FUNCIONES AUXILIARES       ####
+#####################################
+
 def complain_about_get():
     data = {
         'message': "La peticion tiene que ser GET",  
@@ -58,6 +62,13 @@ def form_list_names(lista):
         }
         list_json.append(data)
     return list_json
+
+
+
+#####################################
+#### FUNCIONES PRINCIPALES       ####
+#####################################
+
 
 """ Find a program by its name"""
 def find_by_name(request):
