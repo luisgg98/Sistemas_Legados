@@ -89,6 +89,7 @@ def find_by_name(request):
 """Return a list with all the names of the programs"""
 def get_them_all(request):
     singleton = WindowMgr()
+    # De aqui se obtienen todos los programas
     programa =singleton.lista_todos_los_programas()
     data = form_list_names(programa)
     return JsonResponse(data)
@@ -99,6 +100,7 @@ def get_tape_all(request):
         if request.GET.get('cinta') != '' and request.GET.get('cinta') != None:
             singleton = WindowMgr()
             cinta = request.GET.get('cinta')
+            #De aqui se obtienen las cintas
             resultado = singleton.lista_programas_una_cinta(cinta)
             if resultado != []:
                 data = clean_result(resultado)
