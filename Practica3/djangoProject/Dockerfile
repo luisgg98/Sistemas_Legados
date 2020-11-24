@@ -21,10 +21,6 @@ COPY . /backend/
 # Upgrade pip
 RUN pip install --upgrade pip
 
-#Instal PCBASIC
-RUN pip install pcbasic
-#RUN sh pcbasic/pcbasic-v1.2.14/install.sh
-
 # Install the requirements.
 RUN pip install -r requirements.txt
 

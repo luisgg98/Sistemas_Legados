@@ -75,7 +75,7 @@ class WindowMgr():
 
         # Hemos leido todos los datos y están en el fichero así que cerramos la aplicación legada
         pyautogui.hotkey("ctrl","f9")
-        time.sleep(3)
+        time.sleep(5)
 
 
     def __read_info_from_file(self):
@@ -96,15 +96,16 @@ class WindowMgr():
         return resultado
 
 
-    def __parse_all_columns(self, resultado):
+    def __parse_all_columns(self, resultado,cinta):
         """Generamos una lista de listas con los campos [[nombre,tipo,cinta,registro]]"""
         data = []
         if len(resultado) % 5 == 0:
             i = 0
             while i < len(resultado):
-                r4 = resultado[i + 4].replace(" ", "")
-                e = [resultado[i + 1], resultado[i + 2], resultado[i + 3], r4]
-                data = data + [e]
+                if resultado[i+3] == cinta:
+                    r4 = resultado[i + 4].replace(" ", "")
+                    e = [resultado[i + 1], resultado[i + 2], resultado[i + 3], r4]
+                    data = data + [e]
                 i = i + 5
         return data
 
@@ -127,13 +128,13 @@ class WindowMgr():
         pyautogui.press("enter")
         pyautogui.write(programa, interval=0.15)
         pyautogui.press("enter")
-        time.sleep(1.5)
+        time.sleep(2)
         pyautogui.press("enter")
         pyautogui.press("enter")
         pyautogui.press("enter")
         # Hemos leido el dato y esta en el fichero así que cerramos la aplicación legada
         pyautogui.hotkey("ctrl", "f9")
-        time.sleep(3)
+        time.sleep(5)
 
 
     def __read_found_register_file(self):
@@ -187,7 +188,7 @@ class WindowMgr():
         self.__prepare_aplication()
 
         # Preparamos pyautogui para poder enviar letras/teclas
-        self.__prepare_pyautogui()
+        #self.__prepare_pyautogui()
 
         programa = programa.upper()
         # Busca en la apliacion legada
@@ -207,12 +208,12 @@ class WindowMgr():
         DEVUELVE LISTA DE LISTAS:
         [[nombre, tipo, cinta, registro]] """
 
-    def get_all_programs_info(self):
+    def get_all_programs_tape(self,cinta):
         # Lanzamos la aplicacion legada
         self.__prepare_aplication()
 
         # Preparamos pyautogui para poder enviar letras/teclas
-        self.__prepare_pyautogui()
+        #self.__prepare_pyautogui()
 
         # Accedemos al listado
         pyautogui.typewrite("6")
@@ -225,7 +226,7 @@ class WindowMgr():
         resultado = self.__read_info_from_file()
 
         # Prepara la devolucion en el formato adecuado
-        data = self.__parse_all_columns(resultado)
+        data = self.__parse_all_columns(resultado,cinta)
         return data
 
 
@@ -239,7 +240,7 @@ class WindowMgr():
         self.__prepare_aplication()
 
         # Preparamos pyautogui para poder enviar letras/teclas
-        self.__prepare_pyautogui()
+        #self.__prepare_pyautogui()
 
         # Accedemos al listado
         pyautogui.typewrite("6")
@@ -254,4 +255,12 @@ class WindowMgr():
         # Prepara la devolucion en el formato adecuado
         data = self.__parse_name(resultado)
         return data
+
+
+#w = WindowMgr()
+#list = w.get_all_programs_tape("B")
+#print("hola")
+#print(str(len(list)))
+#for i in list:
+#    print(i)
 
