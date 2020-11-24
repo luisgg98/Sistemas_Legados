@@ -2,305 +2,256 @@ import pyautogui
 import re
 import time
 import os
+import win32gui
+import subprocess
 
 
 class WindowMgr():
     ###########################################
     ##      VARIABLES PRIVADAS               ##
     ###########################################
-    __ending_operaion = "8S" + "\r\n"
-    __windows_new_line = "\r\n"
+    __path = "C:\\Legados\\"
+
+
     ###########################################
     ##      FUNCIONES PRIVADAS               ##
     ###########################################
 
     """FUNCIONES PRIVADAS"""
 
-    """Esta siendo usada en la nueva parte"""
+    def __window_enum_callback(self, hwnd, wildcard):
+        """Pasar a win32gui.EnumWindows() para comprobar todas las ventanas abiertas"""
+        if re.match(wildcard, str(win32gui.GetWindowText(hwnd))) is not None:
+            self._handle = hwnd
 
-    def __check_type_program(self, programa):
-        """Verifica cual es el tipo del programa"""
-        tipo_encontrado = "Indeterminado"
-        # Ya que el numero de tipos es finito, compruebo manualmente
-        # a cual se corresponde, lo elimino de la descripcion del programa
-        # y devuelvo ambos
-        x = re.search("\sVIDE[A-Z]*A\s", programa)
-        if x:
-            programa = re.sub("\sVIDE[A-Z]*A\s", "", programa)
-            return ["VIDEOAVENTURA", programa]
 
-        x = re.search("\sSIM[A-Z]*R\s", programa)
-        if x:
-            programa = re.sub("\sSIM[A-Z]*R\s", "", programa)
-            return ["SIMULADOR", programa]
+    def __find_window_wildcard(self, wildcard):
+        """Encuentra una ventana segun su nombre mediante una expresion"""
+        self._handle = None
+        win32gui.EnumWindows(self.__window_enum_callback, wildcard)
 
-        x = re.search("\sARCADE\s", programa)
-        if x:
-            programa = re.sub("\sARCADE\s", "", programa)
-            return ["ARCADE", programa]
 
-        x = re.search("\sCONV[A-Z]*\s", programa)
-        if x:
-            programa = re.sub("\sCONV[A-Z]*\s", "", programa)
-            return ["CONVERSACIONAL", programa]
+    def __screenshot(self):
+        """Toma una captura de la ventana guardada actual. No debe estar minimizada"""
+        win32gui.SetForegroundWindow(self._handle)
+        x, y, x1, y1 = win32gui.GetClientRect(self._handle)
+        x, y = win32gui.ClientToScreen(self._handle, (x, y))
+        x1, y1 = win32gui.ClientToScreen(self._handle, (x1 - x, y1 - y))
+        pyautogui.screenshot('menu.png', region=(x, y, x1, y1))
 
-        x = re.search("\sJUEGO DE MESA\s", programa)
-        if x:
-            programa = re.sub("\sJUEGO DE MESA\s", "", programa)
-            return ["JUEGO DE MESA", programa]
 
-        x = re.search("\sS[A-Z]* D[A-Z]*TIVO\s", programa)
-        if x:
-            programa = re.sub("\sS[A-Z]* D[A-Z]*TIVO\s", "", programa)
-            return ["S. DEPORTIVO", programa]
+    def __prepare_aplication(self):
+        """Lanza la aplicacion legada"""
+        # Abrimos la aplicación y damos tiempo a que se inicie
+        subprocess.Popen([self.__path + "DOSBox-0.74\DOSBox.exe", self.__path + "Database\gwbasic.bat", "-noconsole"])
+        time.sleep(6)
+        # Make screenshot of Menu
+        self.__find_window_wildcard('.*DOSBox.*')
+        self.__screenshot()
 
-        x = re.search("\sESTR[A-Z]*A\s", programa)
-        if x:
-            programa = re.sub("\sESTR[A-Z]*A\s", "", programa)
-            return ["ESTRATEGIA", programa]
 
-        return [tipo_encontrado, programa]
+    def __prepare_pyautogui(self):
+        """Prepara la ventana correctamente para enviar cosas con pyautogui"""
+        window = pyautogui.getWindowsWithTitle("DOSBox")[0]
+        window.minimize()
+        window.restore()
 
-    def __clean_list(self, datas):
-        """Elimina los elementos innecesarios de la lista"""
+
+    def __in_menu(self):
+        """Devuelve true si estamos en la pantalla de menu"""
+        if pyautogui.locateOnScreen("menu.png"): return True
+        else: return False
+
+
+    def __get_info_in_file(self):
+        """Hace que la aplicacion legada muestre todos los registros"""
+        resultado = []
+        while not self.__in_menu():
+            i = 0
+            while i < 20:
+                pyautogui.press("space")
+                i = i + 1
+                time.sleep(0.20)
+
+        # Hemos leido todos los datos y están en el fichero así que cerramos la aplicación legada
+        pyautogui.hotkey("ctrl","f9")
+        time.sleep(3)
+
+
+    def __read_info_from_file(self):
+        """Lectura del fichero donde esta la salida de la aplicacion legada (que ya esta apagada)"""
+        resultado = []
+        f = open(self.__path + "Database\FILE.txt", "r")
+        lines = f.read().splitlines()
+        f.close()
+        # Eliminamos lineas innecesarias
+        for x in lines:
+            if x[:5] != "PULSA":
+                resultado = resultado + [x]
+            else:
+                resultado = resultado + ["n"]
+        resultado = resultado[15:len(resultado) - 9]
+        resultado = ["n"] + resultado
+        os.remove(self.__path + "Database\FILE.txt" )
+        return resultado
+
+
+    def __parse_all_columns(self, resultado):
+        """Generamos una lista de listas con los campos [[nombre,tipo,cinta,registro]]"""
+        data = []
+        if len(resultado) % 5 == 0:
+            i = 0
+            while i < len(resultado):
+                r4 = resultado[i + 4].replace(" ", "")
+                e = [resultado[i + 1], resultado[i + 2], resultado[i + 3], r4]
+                data = data + [e]
+                i = i + 5
+        return data
+
+
+    def __parse_name(self,resultado):
+        """Devolvemos una lista con los nombres de los registros del sistema"""
+        data = []
+        if len(resultado) % 5 == 0:
+            i = 0
+            while i < len(resultado):
+                data = data + [resultado[i + 1]]
+                i = i + 5
+        return data
+
+
+    def __find_register(self,programa):
+        """Buscamos en la aplicacion legada el registro con el nombre programa"""
+        pyautogui.typewrite("7")
+        pyautogui.typewrite("N")
+        pyautogui.press("enter")
+        pyautogui.write(programa, interval=0.15)
+        pyautogui.press("enter")
+        time.sleep(1.5)
+        pyautogui.press("enter")
+        pyautogui.press("enter")
+        pyautogui.press("enter")
+        # Hemos leido el dato y esta en el fichero así que cerramos la aplicación legada
+        pyautogui.hotkey("ctrl", "f9")
+        time.sleep(3)
+
+
+    def __read_found_register_file(self):
+        """Leemos del fichero los datos del registro con nombre que hemos buscado"""
+        # Lectura del fichero
+        f = open(self.__path + "Database\FILE.txt", "r")
+        lines = f.read().splitlines()
+        f.close()
         i = 0
-        new_list = []
-        while i < (len(datas) - 1):
-            # Elimino las lineas de la pantalla que son o un espacio o cadena vacia
-            if datas[i] != '' and datas[i] != ' ':
-                new_list.append(datas[i])
-            else:
-                pass
-            # me quedo solo con el texto que pueda ser util
-            i = i + 1
-        return new_list
+        found = False
 
-    # Funcion utilizada para buscar un programa por su nombre
-    """Utilizada en la nueva parte"""
-
-    def __filter_result(self, data):
-        """ Data una lista de elementos se queda con el que empieza por un digito"""
-        new_list_list = []
-
-        # Esto es debido a que los elementos de los programas cuando los buscas por
-        # ombre te los muestra 1 por 1 y todos empiezan por su numero de registro
-        # Eliminamos la K QUE SEPARA EL NUMERO DE REGISTRO CON EL RESTO
-        numeros = re.findall("\A\s[0-9]* ", data)
-        numero = numeros[0]
-        # AL RESTO LE QUITAMOS CINTA Y OBTENEMOS SU TIPO DE CINTA
-        cintas = re.findall("CINTA*.*", data)
-        cinta = cintas[-1]
-        # OBTENEMOS EL TIPO DEL PROGRAMA DEL RESTO
-        tipos = self.__check_type_program(data)
-        tipo = tipos[0]
-        # LE QUITAMOS EL RESTO QUE NO NOS SIRVE
-        nombre = tipos[1].replace(cinta, "")
-        nombre = nombre.replace(numero, "")
-        nombre = nombre.replace("- ", "")
-        nombre = re.sub("\A\s", "", nombre)
-        nombre = re.sub("\s\Z", "", nombre)
-        numero = numero.replace(" ", "")
-
-        new_list_list.append(numero)
-        new_list_list.append(nombre)
-        new_list_list.append(tipo)
-
-        cinta = cinta.replace("CINTA:", "")
-        cinta = cinta.replace(" ", "")
-        new_list_list.append(cinta)
-        return new_list_list
-
-    """ Funcion no usada """
-
-    def __some_string_fixes(self, lista):
-        # Limpia algunos caracteres mal leidos
-        lista = lista.replace("> ", "S")
-        lista = lista.replace("?", "7")
-        lista = lista.replace("|", "I")
-        lista = lista.replace("AC IONAL", "ACIONAL")
-        lista = lista.replace("Q)", "Q")
-        lista = lista.replace("». DEPOR", "S.DEPOR")
-        lista = lista.replace("VIDEQA", "VIDEOA")
-        lista = lista.replace("¢@", "7")
-        lista = lista.replace("’ S", "’")
-        lista = lista.replace("X<I", "XXI")
-        return lista
-
-    """ Funcion no usada """
-
-    # Quita lineas vacias
-    def __remove_empty_lines(self, lista):
-        for i in lista:
-            if i == "":
-                lista.remove(i)
-        return lista
-
-    """ Funcion no usada """
-
-    # Comprueba si está en la pantalla menu
-    def __is_menu(self):
-        lista = self.__preprocess_image()
-        lista = lista.split('\n')
-        self.__remove_empty_lines(lista)
-        # Busco linea MENU
-        if lista[0] == 'MENU':
-            return True
-        else:
-            return False
-
-    """ Funcion no usada """
-
-    def __listado_texto_captura(self):
-        # Hago otro pantallazo
-        pantalla = self.screenshot_only()
-        lista = self.__preprocess_image()
-
-        # Separo por lineas
-        lista = lista.split('\n')
-
-        # Elimino las lineas vacias
-        lista = self.__remove_empty_lines(lista)
-        lAux = []
-        for x in lista:
-            # Sustituyo cuando hay dos o mas espacios seguidos por tabulador y arreglo los resultados
-            aux = re.sub("\\s\s+", "\t", x)
-            aux = self.__some_string_fixes(aux)
-
-            # Separo por tabulador para obtener los elementos de una linea
-            aux = aux.split("\t")
-
-            # Compruebo que no es una linea basura
-            isPulsa = aux[0] == 'PULSA SPACE PARA CONTINUAR U OTRA TECLA PARA ACABAR'
-            isFin = aux[0] == '\x0c'
-            if (not isPulsa) and (not isFin):
-                isCabecera = (aux[1] == 'NOMBRE' and aux[2] == 'TIPO')
-                if not isCabecera:
-                    # Si es linea valida, la conservo
-                    aux2 = aux[1]
-                    # Arreglamos si alguna componente no tiene 4 elementos (por mala separacion por tabuladores
-                    if len(aux2) > 30:
-                        aux[1] = aux2[0:30]
-                        aux3 = aux[2]
-                        aux[2] = aux2[31:]
-                        aux = aux + [aux3]
-                    lAux = lAux + [aux]
-        return lAux
-
-    """ Funcion no usada """
-
-    def __delete_last_first(self, lista):
-        lAux = []
-        i = 1
-        for x in lista:
-            # Elimino primero y ultimo
-            aux = x[1:-1]
-            # Añado numero como primer elemento
-            aux = [str(i)] + aux
-            lAux = lAux + [aux]
-            i = i + 1
-        return lAux
-
-    """ Funcion no usada """
-
-    def __listado_registros(self):
-        time.sleep(0.25)
-        lista = []
-        pantalla = self.screenshot_only()
-
-        # Compruebo que no estoy en la pantalla de menu
-        ismenu = self.__is_menu()
-        while not ismenu:
-            lista2 = self.__listado_texto_captura()
-            pyautogui.press('space')
-            lista = lista + lista2
-            pantalla = self.screenshot_only()
-            ismenu = self.__is_menu()
-        lista = self.__delete_last_first(lista)
-        return lista
-
-    """ Funcion no usada """
-
-    def __ordenar_por_grabacion(self):
-        pyautogui.press('3')
-        pyautogui.press('enter')
-        pyautogui.press('4')
-        pyautogui.press('enter')
-        pantalla = self.screenshot_only()
-        isMenu = self.__is_menu()
-        while not isMenu:
-            pantalla = self.screenshot_only()
-            isMenu = self.__is_menu()
-
-    """ Funcion no usada """
-
-    def __listar_todos_programas_cinta(self, cinta, lista):
-        lAux = []
-        for i in lista:
-            # Miramos si coincide la cinta con la buscada
-            if i[3] == cinta:
-                lAux = lAux + [i]
-            else:
-                # Buscamos tambien entre los programas en multiples cintas
-                tape = i[3].split("-")
+        # Buscamos asi la linea porque no siempre aparece el resultado en la misma linea
+        while i < len(lines) and not found:
+            aux = lines[i]
+            if aux[:7] == "DIME EL":
                 found = True
-                j = 0
-                while found and j < len(tape):
-                    if tape[j] == cinta:
-                        # Coincide y debemos añadirlo a la lista
-                        found = False
-                        lAux = lAux + [i]
-                    else:
-                        j = j + 1
-        return lAux
+            else:
+                i = i + 1
+        # Borramos el fichero
+        os.remove(self.__path + "Database\FILE.txt")
+        return lines[i+1]
+
+
+    def __parse_register(self,register):
+        """Si existia un registro con ese nombre devuelve [nombre,tipo,cinta,registro]
+            Si no escistia devuelve una lista vacia []"""
+        data = []
+        if register[:13] != "NO HAY NINGUN":
+            # Sustituyo cuando hay dos o mas espacios seguidos por tabulador y arreglo los resultados
+            aux = re.sub("\\s\s+", "\t", register)
+            aux = aux.split("\t")
+            aux[0] = aux[0].replace(" ","")
+            aux[1] = aux[1].replace("- ","")
+            aux[3] = aux[3].replace("CINTA:","")
+
+            # Transformacion a [[nombre],[tipo],[cinta],[registro]]
+            data = [aux[1]] + [aux[2]] + [aux[3]] + [aux[0]]
+        return data
+
 
     ###########################################
     ##      FUNCIONES PUBLICAS              ##
     ###########################################
 
-    """ BUSCAR DADO EL NOMBRE EL NUMERO DE REGISTRO """
+    """ BUSCAR DADO EL NOMBRE LA INFORMACION DEL REGISTRO 
+        Devuelve:   [nombre, tipo, cinta, registro] si existe
+                    [] si no existe """
 
     def find_program_by_name(self, programa):
-        """Dato del nombre de un programa busca si hay alguno con ese nombre """
-        resultado = []
+        # Lanzamos la aplicacion legada
+        self.__prepare_aplication()
+
+        # Preparamos pyautogui para poder enviar letras/teclas
+        self.__prepare_pyautogui()
+
         programa = programa.upper()
-        script = "7N" + self.__windows_new_line + programa + self.__windows_new_line + self.__windows_new_line + \
-                 self.__windows_new_line + self.__windows_new_line + self.__windows_new_line + self.__ending_operaion
-        f = open("get_program_by_name", "w")
-        f.write(script)
-        f.close()
-        os.system("pcbasic   database -q --output=program_by_name.txt --input=get_program_by_name 2> /dev/null")
-        f = open("program_by_name.txt", "r")
-        lines = f.readlines()
-        f.close()
-        if len(lines) > 12:
-            if "NO HAY NINGUN PROGRAMA CON ESE NOMBRE; PULSA ENTER" in (lines[12]):
-                pass
-            else:
-                resultado = self.__filter_result(lines[12])
-        os.remove("program_by_name.txt")
-        os.remove("get_program_by_name")
-        return resultado
+        # Busca en la apliacion legada
+        self.__find_register(programa)
+
+        # Lee el fichero con la salida de la aplicacion legada
+        register = self.__read_found_register_file()
+
+        # Prepara la devolucion en el formato adecuado
+        result = self.__parse_register(register)
+
+        return result
+
+
 
     """ LISTADO DE TODOS LOS REGISTROS DEL SISTEMA
         DEVUELVE LISTA DE LISTAS:
-        [[numero, nombre, tipo, cinta]] """
+        [[nombre, tipo, cinta, registro]] """
 
-    """ Completar funcionalidad """
+    def get_all_programs_info(self):
+        # Lanzamos la aplicacion legada
+        self.__prepare_aplication()
 
-    def lista_todos_los_programas(self):
-        # NOS ASEGURAMOS DE QUE VAMOS A LEER POR ORDEN DE GRABACION
-        # self.__ordenar_por_grabacion()
-        # VAMOS AL LISTADO
-        pyautogui.press('6')
-        pyautogui.press('enter')
-        lista = self.__listado_registros()
-        return lista
+        # Preparamos pyautogui para poder enviar letras/teclas
+        self.__prepare_pyautogui()
 
-    """ Completar funcionalidad """
+        # Accedemos al listado
+        pyautogui.typewrite("6")
+        pyautogui.press("enter")
 
-    def lista_programas_una_cinta(self, cinta):
-        # obtenemos el listado de todos los programas
-        lista = self.lista_todos_los_programas()
-        # filtramos por cinta
-        lista = self.__listar_todos_programas_cinta(cinta, lista)
-        return lista
+        # La aplicacion legada lista todos los registros
+        self.__get_info_in_file()
+
+        # Leemos el listado del fichero de la salida de la apliacion legada
+        resultado = self.__read_info_from_file()
+
+        # Prepara la devolucion en el formato adecuado
+        data = self.__parse_all_columns(resultado)
+        return data
+
+
+
+    """ LISTADO DE TODOS LOS NOMBRES DE REGISTROS DEL SISTEMA
+           DEVUELVE LISTA DE LISTAS:
+           [nombre1,nombre2,...] """
+
+    def get_name_programs(self):
+        # Lanzamos la aplicacion legada
+        self.__prepare_aplication()
+
+        # Preparamos pyautogui para poder enviar letras/teclas
+        self.__prepare_pyautogui()
+
+        # Accedemos al listado
+        pyautogui.typewrite("6")
+        pyautogui.press("enter")
+
+        # La aplicacion legada lista todos los registros
+        self.__get_info_in_file()
+
+        # Leemos el listado del fichero de la salida de la apliacion legada
+        resultado = self.__read_info_from_file()
+
+        # Prepara la devolucion en el formato adecuado
+        data = self.__parse_name(resultado)
+        return data
+

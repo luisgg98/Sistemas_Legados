@@ -1,0 +1,13 @@
+Requisitos para que funcione el wrapper:
+1. Utilizar Windows
+2. Situar en el directorio: C:/Legados/ el material de la aplicacion legada (descomprimir).
+    La ruta quedara:
+    |_ C:/Legados
+        |_ Database
+        |_ DOSBox-0.74
+        |_ database.bat
+3. En caso de que la ruta anterior no pueda crearse, deberá situarse la apliacion donde se desee y reemplazar el
+    contenido de la variable "__path" del fichero "wrapper.py" con la ruta correspondiente
+4. Reemplazar el fichero "gwbasic.bat" situado en C:/Legados/Database por el nuevo (github)
+
+De esta manera el wrapper funcionara adecuadamente
