@@ -25,12 +25,24 @@ class _ListaNombreProgramasViewState extends State<ListaNombreProgramasView> {
       itemCount: listaNombres == null ? 1 : listaNombres.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return ListTile(title: Text('Nombre'));
+          return ListTile(
+              title: Container(
+            width: 1,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Colors.blue,
+            ),
+            child: Text(
+              'Listado de nombres',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ));
         }
         index -= 1;
 
         return ListTile(
-          title: Text(listaNombres[index]),
+          title: Center(child: Text(listaNombres[index])),
           onTap: () {
             List<Program> listaPrograma = [];
             listaPrograma.add(fetchProgramByName(listaNombres[index]));

@@ -18,21 +18,40 @@ class ListaProgramasView extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == 0) {
           return ListTile(
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text("Registro"),
-                ),
-                Expanded(
-                  child: Text("Nombre"),
-                ),
-                Expanded(
-                  child: Text("Tipo"),
-                ),
-                Expanded(
-                  child: Text("Cinta"),
-                ),
-              ],
+            title: Container(
+              padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: Colors.blue,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Registro",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Nombre",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Tipo",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Cinta",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }
