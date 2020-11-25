@@ -7,11 +7,18 @@ import 'package:frontapp/screens/home/components/lista_programas_view.dart';
 import 'package:frontapp/services/legacyapp.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
+import 'components/reload_button.dart';
+
+class Home extends StatefulWidget {
   const Home({
     Key key,
   }) : super(key: key);
 
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -27,27 +34,11 @@ class Home extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ElevatedButton(
-                child: Row(
-                  children: [
-                    Icon(Icons.replay_outlined),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("Reload")
-                  ],
-                ),
-                onPressed: () {
-                  Provider.of<ListaNombresProgramas>(context, listen: false)
-                      .listaNombres = fetchProgramsName();
-                  Provider.of<ListaProgramas>(context, listen: false)
-                      .deleteAll();
-                },
-              ),
+              ReloadButton(),
               Consumer<ListaNombresProgramas>(
                   builder: (context, listaNombres, child) =>
                       Text("Número de programas: ${listaNombres.numPrograms}")),
-              Buscador()
+              Buscador(),
             ],
           ),
         ),

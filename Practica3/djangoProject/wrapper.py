@@ -33,7 +33,7 @@ class WindowMgr():
 
     def __screenshot(self):
         """Toma una captura de la ventana guardada actual. No debe estar minimizada"""
-        win32gui.SetForegroundWindow(self._handle)
+        #win32gui.SetForegroundWindow(self._handle)
         x, y, x1, y1 = win32gui.GetClientRect(self._handle)
         x, y = win32gui.ClientToScreen(self._handle, (x, y))
         x1, y1 = win32gui.ClientToScreen(self._handle, (x1 - x, y1 - y))

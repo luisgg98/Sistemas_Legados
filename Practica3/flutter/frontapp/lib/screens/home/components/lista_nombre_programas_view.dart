@@ -45,9 +45,11 @@ class _ListaNombreProgramasViewState extends State<ListaNombreProgramasView> {
           title: Center(child: Text(listaNombres[index])),
           onTap: () {
             List<Program> listaPrograma = [];
-            listaPrograma.add(fetchProgramByName(listaNombres[index]));
-            Provider.of<ListaProgramas>(context, listen: false).listaProgramas =
-                listaPrograma;
+            fetchProgramByName(listaNombres[index]).then((value) {
+              listaPrograma.add(value);
+              Provider.of<ListaProgramas>(context, listen: false)
+                  .listaProgramas = listaPrograma;
+            });
           },
         );
       },

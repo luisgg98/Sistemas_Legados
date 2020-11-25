@@ -18,7 +18,7 @@ void main() {
     home: MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ListaNombresProgramas()),
-        ChangeNotifierProvider(create: (context) => ListaProgramas())
+        ChangeNotifierProvider(create: (context) => ListaProgramas()),
       ],
       child: Home(),
     ),

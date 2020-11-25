@@ -38,9 +38,10 @@ class _BuscadorState extends State<Buscador> {
           child: ElevatedButton(
             child: Text("Buscar"),
             onPressed: () {
-              List<Program> listaProgramas = fetchProgramsByTape(cintaABuscar);
-              Provider.of<ListaProgramas>(context, listen: false)
-                  .listaProgramas = listaProgramas;
+              fetchProgramsByTape(cintaABuscar).then((value) {
+                Provider.of<ListaProgramas>(context, listen: false)
+                    .listaProgramas = value;
+              });
             },
           ),
         )

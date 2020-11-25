@@ -1,78 +1,51 @@
+import 'dart:html';
+
 import 'package:frontapp/models/program.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-List<String> fetchProgramsName() {
-  List<String> nombres = [];
-  for (int i = 0; i < 200; i++) {
-    nombres.add("nombre" + i.toString());
-  }
+final String host = "http://80fd5d9c0c62.ngrok.io";
 
-  return nombres;
-  /*
-  final response =
-      await http.get('');
+Future<List<String>> fetchProgramsName() async {
+  final response = await http.get('$host/get_them_all/');
+  List<String> lista = [];
 
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    List programas = jsonDecode(response.body)['data'];
-    List<Program> listaProgramas = [];
-    programas.forEach((element) {
-      listaProgramas.add(Program(
-          registro: element['registro'],
-          nombre: element['nombre'],
-          tipo: element['tipo'],
-          cinta: element['cinta']));
+    List<dynamic> datos = jsonDecode(response.body);
+    datos.forEach((element) {
+      lista.add(element['nombre']);
     });
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load programs');
   }
 
-  */
+  return lista;
 }
 
-List<Program> fetchProgramsByTape(String tape) {
-  List<Program> programas = [];
-  for (int i = 0; i < 200; i++) {
-    programas.add(Program(
-        registro: i.toString(),
-        nombre: "nombre$i",
-        tipo: "tipo$i",
-        cinta: tape));
-  }
-  return programas;
-  /*
-  final response =
-      await http.get('');
-
+Future<List<Program>> fetchProgramsByTape(String tape) async {
+  final response = await http.get('$host/get_tape_all/?cinta=$tape');
+  List<Program> listaProgramas = [];
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response,
-    // then parse the JSON.
-    List programas = jsonDecode(response.body)['data'];
-    List<Program> listaProgramas = [];
-    programas.forEach((element) {
+    List<dynamic> datos = jsonDecode(response.body);
+
+    datos.forEach((element) {
       listaProgramas.add(Program(
-          registro: element['registro'],
-          nombre: element['nombre'],
-          tipo: element['tipo'],
-          cinta: element['cinta']));
+        registro: element['registro'],
+        nombre: element['nombre'],
+        tipo: element['tipo'],
+        cinta: element['cinta'],
+      ));
     });
-  } else {
-    // If the server did not return a 200 OK response,
-    // then throw an exception.
-    throw Exception('Failed to load programs');
   }
 
-  */
+  return listaProgramas;
 }
 
-Program fetchProgramByName(String name) {
+Future<Program> fetchProgramByName(String name) async {
+  final response = await http.get('$host/find_by_name/?program=${name}');
+  Map<String, dynamic> datos = jsonDecode(response.body);
+
   return Program(
-      registro: "Registro$name",
-      nombre: name,
-      tipo: "tipo$name",
-      cinta: "cinta$name");
+      registro: datos['registro'],
+      nombre: datos['nombre'],
+      tipo: datos['tipo'],
+      cinta: datos['cinta']);
 }
