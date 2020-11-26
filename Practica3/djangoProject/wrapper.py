@@ -95,6 +95,15 @@ class WindowMgr():
         os.remove(self.__path + "Database\FILE.txt" )
         return resultado
 
+    def __is_tape(self,cinta,cinta_i):
+        """ Comprobar que la cinta esta en cinta_i"""
+        isTape = False
+        aux = cinta_i.split("-")
+        for x in aux:
+            if x == cinta:
+                aux = cinta_i.split("-")
+                isTape = True
+        return isTape
 
     def __parse_all_columns(self, resultado,cinta):
         """Generamos una lista de listas con los campos [[nombre,tipo,cinta,registro]]"""
@@ -102,7 +111,7 @@ class WindowMgr():
         if len(resultado) % 5 == 0:
             i = 0
             while i < len(resultado):
-                if resultado[i+3] == cinta:
+                if self.__is_tape(cinta, resultado[i+3]):
                     r4 = resultado[i + 4].replace(" ", "")
                     e = [resultado[i + 1], resultado[i + 2], resultado[i + 3], r4]
                     data = data + [e]
@@ -257,10 +266,4 @@ class WindowMgr():
         return data
 
 
-#w = WindowMgr()
-#list = w.get_all_programs_tape("B")
-#print("hola")
-#print(str(len(list)))
-#for i in list:
-#    print(i)
 
